@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",                       // Modern JavaScript target
+    "useDefineForClassFields": true,          // Aligns with the latest class field proposal
+    "lib": ["ES2020", "DOM", "DOM.Iterable"], // Libraries to include
+    "module": "ESNext",                       // Module system to use
+    "moduleResolution": "node",               // Use Node.js module resolution
+    "allowImportingTsExtensions": true,       // Allow importing TypeScript file extensions
+    "isolatedModules": true,                  // Ensures that each file is treated as a separate module
+    "moduleDetection": "force",               // Force module detection
+    "noEmit": true,                           // Prevents emitting files (for bundler use)
+    "jsx": "react-jsx",                       // JSX transformation mode for React
+    "strict": true,                          // Enable all strict type-checking options
+    "noUnusedLocals": true,                   // Report errors on unused local variables
+    "noUnusedParameters": true,               // Report errors on unused function parameters
+    "noFallthroughCasesInSwitch": true        // Prevent fall-through cases in switch statements
+  },
+  "include": ["src"],                        // Include source files
+  "exclude": ["node_modules", "build"]       // Exclude specific directories
+}
