@@ -118,7 +118,7 @@ function FlightRecordingForm() {
   };
 
   const handleExitChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setMaxSize(event.target.value);
+    setDumpOnExit(event.target.checked);
   };
 
   return (
@@ -179,6 +179,12 @@ function FlightRecordingForm() {
               Dump on Exit?
             </label>
           </div>
+          {/* <div className="mb-3">
+            <label htmlFor="formFile" className="form-label">
+              Upload custom configuration file
+            </label>
+            <input className="form-control" type="file" id="formFile" />
+          </div> */}
         </div>
       </form>
       <Button

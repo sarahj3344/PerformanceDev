@@ -1,3 +1,8 @@
+.disabled {
+  pointer-events: none; /* Disables mouse events */
+  opacity: 0.5; /* Optional: makes it look disabled */
+}
+
 .container {
   display: flex;
   flex-direction: column;
@@ -110,6 +115,24 @@
   margin-bottom: 1rem; /* Standard margin size for spacing */
 }
 
+.form-control {
+  display: block;
+  width: 100%;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #212529;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #ced4da;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border-radius: 0.25rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
 .form-select {
   display: block;
   /* width: 100%; */
@@ -117,10 +140,11 @@
   padding: 0.375rem 0.75rem;
   font-size: 1rem;
   line-height: 1.5;
-  color: #495057;
-  background-color: #ffffff;
+  background-color: #429ede;
+  color: #ffffff;
+  font-weight: bold;
   background-clip: padding-box;
-  border: 1px solid #ced4da;
+  border: 1px solid #a5a5a4;
   margin-top: 0;
   margin-bottom: 0;
   appearance: none; /* Remove default styling in some browsers */
@@ -153,7 +177,8 @@
   color: #284f93; /* Text color for active tab */
   font-weight: bold;
   background-color: #fff; /* Background color for active tab */
-  border-color: #dee2e6 #dee2e6 #fff; /*Border color for active tab*/
+  border-color: #f7901e #e6e4de #fff;
+  border-top-width: medium; /*Border color for active tab*/
 }
 
 /* Style for disabled tab */
@@ -193,7 +218,8 @@
 .alert-danger {
   color: #721c24;
   background-color: #f8d7da;
-  border-color: #f5c6cb;
+  border-color: #721c24;
+  margin-top: 2%;
 }
 
 .alert-danger hr {

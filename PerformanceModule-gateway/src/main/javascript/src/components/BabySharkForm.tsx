@@ -23,17 +23,12 @@ function BabySharkForm() {
   const [ip, setIp] = useState<string>("");
   const [port, setPort] = useState<string>("");
   const [connectionName, setConnectionName] = useState<string>("");
+  const [logging, setLogging] = useState<boolean>(false);
 
   const [running, setRunning] = useState(false);
   const [hasFetched, setHasFetched] = useState<boolean>(false);
 
-  let subsystems = [
-    "Modbus TCP Driver",
-    "Logix Driver",
-    "DNP3 Driver",
-    "SMTP",
-    "Database",
-  ];
+  let subsystems = ["Modbus TCP Driver", "Logix Driver", "DNP3 Driver", "SMTP"];
 
   // useEffect(() => {}, []);
 
@@ -110,9 +105,10 @@ function BabySharkForm() {
       port: port,
       filter: inputFilter,
       connection: connectionName,
+      logging: logging,
     };
 
-    fetch("/data/performance/start-capture", {
+    const response = await fetch("/data/performance/start-capture", {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -120,6 +116,8 @@ function BabySharkForm() {
       },
       body: JSON.stringify(params),
     });
+    const state = await response.json();
+    if (state.running === false) setRunning(false);
   };
 
   const stopCapture = () => {
@@ -160,6 +158,10 @@ function BabySharkForm() {
     setFilter(event.target.value);
   };
 
+  const handleLoggingChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setLogging(event.target.checked);
+  };
+
   return (
     <>
       <form>
@@ -177,7 +179,7 @@ function BabySharkForm() {
               <option value="">Select Network Interface</option>
               {networkInterfaces.map((iface, index) => (
                 <option key={index} value={iface.name}>
-                  {iface.name}
+                  {iface.description}
                 </option>
               ))}
             </select>
@@ -248,7 +250,7 @@ function BabySharkForm() {
           </div>
           <div className="input-group mb-3">
             <span className="input-group-text" id="basic-addon1">
-              Filter
+              Protocol Filter
             </span>
             <input
               type="text"
@@ -266,6 +268,7 @@ function BabySharkForm() {
               type="checkbox"
               role="switch"
               id="flexSwitchCheckDefault"
+              onChange={handleLoggingChange}
             ></input>
             <label
               className="form-check-label"
