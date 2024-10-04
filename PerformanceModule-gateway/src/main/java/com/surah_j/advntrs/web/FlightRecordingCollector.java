@@ -5,6 +5,7 @@ import com.inductiveautomation.ignition.common.util.LoggerEx;
 import com.inductiveautomation.ignition.gateway.dataroutes.RequestContext;
 import com.inductiveautomation.ignition.gateway.model.GatewayContext;
 import com.surah_j.advntrs.DiagnosticsManagerImpl$JfrFileContributor;
+import com.surah_j.advntrs.GatewayHook;
 import org.json.JSONException;
 import org.json.JSONObject;
 import jdk.jfr.Configuration;
@@ -25,16 +26,17 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
 import static jdk.jfr.RecordingState.RUNNING;
+import static jdk.jfr.RecordingState.STOPPED;
 
 public class FlightRecordingCollector {
 
     private final LoggerEx log = LogUtil.getLogger(getClass().getSimpleName());
-
     private Recording recording;
     private String configuration;
     private final AtomicBoolean jfrCapturing = new AtomicBoolean(false);
     private final Map<String, String> recordsMap = new HashMap<>();
-    private Boolean exit;
+    private Boolean exit = false;
+    private File file;
 
     private long age = 0;
     private long maxSize = 0;
@@ -44,11 +46,14 @@ public class FlightRecordingCollector {
     private String sizeType = "m";
     private String durationType = "m";
 
+    GatewayContext context;
+
     // takes the body of the response in start capture route and sets variables
     public void setProperties(JSONObject body) throws JSONException {
         configuration = body.getString("configuration");
         ageType = body.getString("ageTime");
         sizeType = body.getString("sizeMetric");
+        exit = body.getBoolean("exit");
         String durationStr = body.getString("duration");
         String maxSizeStr = body.getString("size");
         String ageStr = body.getString("age");
@@ -79,14 +84,6 @@ public class FlightRecordingCollector {
         }
 
         exit = body.getBoolean("exit");
-//        configuration = body.getString("configuration");
-//        age = Long.parseLong(body.getString("age"));
-//        ageType = body.getString("ageTime");
-//        sizeType = body.getString("sizeMetric");
-//        durationType = body.getString("durationTime");
-//        duration = Long.parseLong(body.getString("duration"));
-//        maxSize = Long.parseLong(body.getString("size"));
-//        exit = body.getBoolean("exit");
     }
 
     // maps to jfr configuration files
@@ -101,7 +98,7 @@ public class FlightRecordingCollector {
         Configuration config;
         setRecordsMap();
         try {
-            String stream = recordsMap.get(configuration);
+            String stream = recordsMap.getOrDefault(configuration, "/com/surah_j/advntrs/MemoryandThreadMonitoringLite.jfc");
             log.info(stream);
             InputStream configStream = getClass().getResourceAsStream(stream);
             assert configStream != null;
@@ -165,59 +162,65 @@ public class FlightRecordingCollector {
     }
 
     // **** Starts Recording *****
-    public void startRecording(RequestContext reqContext) throws IOException {
+    public void startRecording() throws IOException {
+        GatewayContext context = GatewayHook.context;
+        File file = dumpFile(context);
+        this.file = file;
+        log.info(String.valueOf(Path.of(file.getPath())));
         Configuration config = setConfiguration(configuration);
         recording = new Recording(config);
         if(age != 0){setMaxAge(age);}
         if(duration != 0){setMaxDuration(duration);}
         if(maxSize != 0){setMaxSize(maxSize);}
+        if(exit){
+            recording.setDumpOnExit(exit);
+        }
         recording.setToDisk(true);
-        recording.setDumpOnExit(exit);
+        recording.setDestination(Path.of(file.getPath()));
         recording.setName("FlightRecording");
         recording.start();
+
         jfrCapturing.set(true);
         log.info("JFR recording started.");
 
         // Start a new thread to monitor the recording. So we can see on status page if running.
         new Thread(() -> {
             try {
-                monitorRecording(reqContext);
+                monitorRecording(context, file);
             } catch (InterruptedException | IOException e) {
                 throw new RuntimeException(e);
             }
         }).start();
     }
 
-    public void monitorRecording(RequestContext reqContext) throws InterruptedException, IOException {
+    public void monitorRecording(GatewayContext context, File file) throws InterruptedException, IOException {
         try {
             // Checks state of recording
             while (recording.getState().equals(RUNNING)) {
                 Thread.sleep(1000);
             }
             log.info("Recording has stopped");
-
-            // Sets file path name for dump to disk. This is for when NOT using manual stop.
-            File directory = reqContext.getGatewayContext().getSystemManager().getLogsDir();
-            LocalDateTime currentDate = LocalDateTime.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMddHHmmss");
-            String formattedDate = currentDate.format(formatter);
-            String filename = "FlightRecording_" + formattedDate + ".jfr";
-            File file = new File(directory, filename);
+            cleanup(context);
 
             // sets capture thread to false
             jfrCapturing.set(false);
 
             // dumps to disk
-            try {
-                recording.dump(Path.of(file.getPath()));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            if(recording.getState() == STOPPED){
+                try {
+                    log.info("Stopping capture and dumping file Option A");
+                    log.info(String.valueOf(Path.of(file.getPath())));
+                    recording.dump(Path.of(file.getPath()));
+                    log.info("JFR recording stopped. File saved to: " + file.getPath());
+                    // performs clean up on filesystem
+                    cleanup(context);
+//                diagnosticFiles(reqContext);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                } finally {
+                    recording.close();
+                }
             }
-            log.info("JFR recording stopped. File saved to: " + file.getPath());
-            recording.close();
-            // performs clean up on filesystem
-            cleanup(reqContext);
-            diagnosticFiles(reqContext);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             log.error("Monitoring thread interrupted.", e);
@@ -234,35 +237,31 @@ public class FlightRecordingCollector {
     }
 
     // manual stop to recording
-    public void stopRecording(RequestContext reqContext, HttpServletResponse response) throws IOException {
+    public void stopRecording(GatewayContext context) throws IOException {
         String responseBody;
-        File directory = reqContext.getGatewayContext().getSystemManager().getLogsDir();
-        LocalDateTime currentDate = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMddHHmmss");
-        String formattedDate = currentDate.format(formatter);
-        String filename = "FlightRecording_" + formattedDate + ".jfr";
-        File file = new File(directory, filename);
 
-        if (!jfrCapturing.get()) {
-            responseBody = "No capture running";
-            response.setContentLength(responseBody.length());
-            response.getWriter().write(responseBody);
-        }
+//        if (!jfrCapturing.get()) {
+//            responseBody = "No capture running";
+//            response.setContentLength(responseBody.length());
+//            response.getWriter().write(responseBody);
+//        }
 
         if (recording != null) {
-            recording.stop();
-            jfrCapturing.set(false);
             try {
-                recording.dump(Path.of(file.getPath()));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+                log.info("Manual stop Option B");
+//                log.info(String.valueOf(Path.of(file.getPath())));
+//                recording.dump(Path.of(file.getPath()));
+                recording.stop();
+                jfrCapturing.set(false);
+            } finally {
+                recording.close(); // Ensure recording is closed afterward
             }
-            recording.close();
             log.info("JFR recording stopped. File saved to: " + file.getPath());
         }
 
         // resets variables for next recording
         configuration = null;
+        file = null;
         maxSize = 0;
         age = 0;
         duration = 0;
@@ -270,11 +269,21 @@ public class FlightRecordingCollector {
         sizeType = "m";
         durationType = "m";
 
-        cleanup(reqContext);
+        cleanup(context);
 
-        responseBody = "Capture stopped";
-        response.setContentLength(responseBody.length());
-        response.getWriter().write(responseBody);
+//        responseBody = "Capture stopped";
+//        response.setContentLength(responseBody.length());
+//        response.getWriter().write(responseBody);
+    }
+
+    public File dumpFile(GatewayContext context){
+        File directory = context.getSystemManager().getLogsDir();
+        LocalDateTime currentDate = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd_HHmmss");
+        String formattedDate = currentDate.format(formatter);
+        String filename = "FlightRecording_" + formattedDate + ".jfr";
+        File file = new File(directory, filename);
+        return file;
     }
 
     public void diagnosticFiles(RequestContext reqContext) {
@@ -283,11 +292,11 @@ public class FlightRecordingCollector {
         context.getDiagnosticsManager().addContributor(new DiagnosticsManagerImpl$JfrFileContributor(context));
     }
 
-    public void cleanup(RequestContext reqContext) {
+    public void cleanup(GatewayContext context) {
         int daysOld = 1;
         int maxFiles = 3;
         Instant cutoffDate = Instant.now().minus(daysOld, ChronoUnit.DAYS);
-        File directory = reqContext.getGatewayContext().getSystemManager().getLogsDir();
+        File directory = context.getSystemManager().getLogsDir();
 
         // Comparator for comparing file modification times
         Comparator<Path> comparator = Comparator.comparingLong(path -> {

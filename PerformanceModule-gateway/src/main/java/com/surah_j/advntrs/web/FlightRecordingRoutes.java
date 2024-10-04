@@ -5,6 +5,7 @@ import com.inductiveautomation.ignition.common.util.LoggerEx;
 import com.inductiveautomation.ignition.gateway.dataroutes.HttpMethod;
 import com.inductiveautomation.ignition.gateway.dataroutes.RequestContext;
 import com.inductiveautomation.ignition.gateway.dataroutes.RouteGroup;
+import com.inductiveautomation.ignition.gateway.dataroutes.WicketAccessControl;
 import com.inductiveautomation.ignition.gateway.model.GatewayContext;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,10 +20,12 @@ public class FlightRecordingRoutes {
 
     private final LoggerEx log = LogUtil.getLogger(getClass().getSimpleName());
     private final RouteGroup routes;
+    public final GatewayContext context;
     FlightRecordingCollector Apollo = new FlightRecordingCollector();
 
     public FlightRecordingRoutes(GatewayContext context, RouteGroup group) {
         this.routes = group;
+        this.context = context;
     }
 
     public void mountRoutes() {
@@ -32,19 +35,20 @@ public class FlightRecordingRoutes {
         routes.newRoute("/jfrstate")
                 .handler(this::jfrInitialState)
                 .type(TYPE_JSON)
+                .restrict(WicketAccessControl.STATUS_SECTION)
                 .mount();
 
         routes.newRoute("/jfr-start-capture")
                 .handler(this::jfrStartCapture)
                 .type(TYPE_JSON)
                 .method(HttpMethod.POST)
-//                .restrict(WicketAccessControl.STATUS_SECTION)
+                .restrict(WicketAccessControl.STATUS_SECTION)
                 .mount();
 
         routes.newRoute("/jfr-stop-capture")
                 .handler(this::jfrStopCapture)
                 .type(TYPE_JSON)
-//                .restrict(WicketAccessControl.STATUS_SECTION)
+                .restrict(WicketAccessControl.STATUS_SECTION)
                 .mount();
 
         log.info("Routes mounted");
@@ -65,16 +69,18 @@ public class FlightRecordingRoutes {
         // Get the writer to send response
 
         String req = request.readBody();
+        GatewayContext context = request.getGatewayContext();
         JSONObject body = new JSONObject(req);
-        log.info(body.toString());
+        log.trace(body.toString());
         Apollo.setProperties(body);
-        Apollo.startRecording(request);
+        Apollo.startRecording();
         return 0;
-}
+    }
 
-    public Object jfrStopCapture(RequestContext context, HttpServletResponse response) throws IOException {
-        Apollo.stopRecording(context, response);
-        Apollo.diagnosticFiles(context);
+    public Object jfrStopCapture(RequestContext request, HttpServletResponse response) throws IOException {
+        Apollo.stopRecording(context);
+        log.info("Diagnostic files triggered");
+//        Apollo.diagnosticFiles(context);
         return 0;
     }
 }

@@ -45,8 +45,14 @@ var Alert = function Alert(_ref) {
     role: "status"
   }, /*#__PURE__*/React.createElement("span", {
     className: "visually-hidden"
-  }, "Loading..."))));
+  }, "Loading...")), /*#__PURE__*/React.createElement("br", null)), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("img", {
+    src: "https://media4.giphy.com/media/5GuExKmluBdrrtAFwk/giphy.gif?cid=6c09b9520tlpio8v26hrws5shr0zbap1g56okehnz8j6wpoy&ep=v1_gifs_search&rid=giphy.gif&ct=g",
+    alt: "Samezu Shark"
+  })));
 };
+
+// https://media1.giphy.com/media/HF4HYBRaZsOcPEFEgB/giphy.gif?cid=6c09b9528118f164qeusgv9c23ekq3h9dl4akdb6i9p7jllz&ep=v1_gifs_search&rid=giphy.gif&ct=g
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Alert);
 
 /***/ }),
@@ -116,13 +122,17 @@ function BabySharkForm() {
     setConnectionName = _useState16[1];
   var _useState17 = (0,react__WEBPACK_IMPORTED_MODULE_2__.useState)(false),
     _useState18 = _slicedToArray(_useState17, 2),
-    running = _useState18[0],
-    setRunning = _useState18[1];
+    logging = _useState18[0],
+    setLogging = _useState18[1];
   var _useState19 = (0,react__WEBPACK_IMPORTED_MODULE_2__.useState)(false),
     _useState20 = _slicedToArray(_useState19, 2),
-    hasFetched = _useState20[0],
-    setHasFetched = _useState20[1];
-  var subsystems = ["Modbus TCP Driver", "Logix Driver", "DNP3 Driver", "SMTP", "Database"];
+    running = _useState20[0],
+    setRunning = _useState20[1];
+  var _useState21 = (0,react__WEBPACK_IMPORTED_MODULE_2__.useState)(false),
+    _useState22 = _slicedToArray(_useState21, 2),
+    hasFetched = _useState22[0],
+    setHasFetched = _useState22[1];
+  var subsystems = ["Modbus TCP Driver", "Logix Driver", "DNP3 Driver", "SMTP"];
 
   // useEffect(() => {}, []);
 
@@ -229,7 +239,7 @@ function BabySharkForm() {
   subsystem]);
   var startCapture = /*#__PURE__*/function () {
     var _ref3 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-      var params;
+      var params, response, state;
       return _regeneratorRuntime().wrap(function _callee3$(_context3) {
         while (1) switch (_context3.prev = _context3.next) {
           case 0:
@@ -238,9 +248,11 @@ function BabySharkForm() {
               ip: ip,
               port: port,
               filter: inputFilter,
-              connection: connectionName
+              connection: connectionName,
+              logging: logging
             };
-            fetch("/data/performance/start-capture", {
+            _context3.next = 3;
+            return fetch("/data/performance/start-capture", {
               method: "POST",
               headers: {
                 Accept: "application/json",
@@ -248,7 +260,14 @@ function BabySharkForm() {
               },
               body: JSON.stringify(params)
             });
-          case 2:
+          case 3:
+            response = _context3.sent;
+            _context3.next = 6;
+            return response.json();
+          case 6:
+            state = _context3.sent;
+            if (state.running === false) setRunning(false);
+          case 8:
           case "end":
             return _context3.stop();
         }
@@ -285,6 +304,9 @@ function BabySharkForm() {
   var handleFilterChange = function handleFilterChange(event) {
     setFilter(event.target.value);
   };
+  var handleLoggingChange = function handleLoggingChange(event) {
+    setLogging(event.target.checked);
+  };
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("form", null, /*#__PURE__*/React.createElement("div", {
     className: "content"
   }, /*#__PURE__*/React.createElement("div", {
@@ -303,7 +325,7 @@ function BabySharkForm() {
     return /*#__PURE__*/React.createElement("option", {
       key: index,
       value: iface.name
-    }, iface.name);
+    }, iface.description);
   }))), /*#__PURE__*/React.createElement("div", {
     className: "input-group mb-3"
   }, /*#__PURE__*/React.createElement("label", {
@@ -369,7 +391,7 @@ function BabySharkForm() {
   }, /*#__PURE__*/React.createElement("span", {
     className: "input-group-text",
     id: "basic-addon1"
-  }, "Filter"), /*#__PURE__*/React.createElement("input", {
+  }, "Protocol Filter"), /*#__PURE__*/React.createElement("input", {
     type: "text",
     className: "form-control",
     placeholder: "Filter",
@@ -383,7 +405,8 @@ function BabySharkForm() {
     className: "form-check-input",
     type: "checkbox",
     role: "switch",
-    id: "flexSwitchCheckDefault"
+    id: "flexSwitchCheckDefault",
+    onChange: handleLoggingChange
   }), /*#__PURE__*/React.createElement("label", {
     className: "form-check-label",
     htmlFor: "flexSwitchCheckDefault"
@@ -637,7 +660,7 @@ function FlightRecordingForm() {
     setMaxSize(event.target.value);
   };
   var handleExitChange = function handleExitChange(event) {
-    setMaxSize(event.target.value);
+    setDumpOnExit(event.target.checked);
   };
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("form", null, /*#__PURE__*/React.createElement("div", {
     className: "content"
@@ -737,10 +760,7 @@ var InputDropdown = function InputDropdown(_ref) {
     value: datatype,
     onChange: onChange2,
     required: true
-  }, /*#__PURE__*/React.createElement("option", {
-    value: "",
-    disabled: true
-  }, placeholder), rowData.map(function (config, index) {
+  }, rowData.map(function (config, index) {
     return /*#__PURE__*/React.createElement("option", {
       key: index,
       value: config.value
@@ -766,6 +786,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _BabySharkForm__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./BabySharkForm */ "./src/components/BabySharkForm.tsx");
 /* harmony import */ var _shark_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./shark.css */ "./src/components/shark.css");
 /* harmony import */ var _FlightRecordingForm__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./FlightRecordingForm */ "./src/components/FlightRecordingForm.tsx");
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return e; }; var t, e = {}, r = Object.prototype, n = r.hasOwnProperty, o = Object.defineProperty || function (t, e, r) { t[e] = r.value; }, i = "function" == typeof Symbol ? Symbol : {}, a = i.iterator || "@@iterator", c = i.asyncIterator || "@@asyncIterator", u = i.toStringTag || "@@toStringTag"; function define(t, e, r) { return Object.defineProperty(t, e, { value: r, enumerable: !0, configurable: !0, writable: !0 }), t[e]; } try { define({}, ""); } catch (t) { define = function define(t, e, r) { return t[e] = r; }; } function wrap(t, e, r, n) { var i = e && e.prototype instanceof Generator ? e : Generator, a = Object.create(i.prototype), c = new Context(n || []); return o(a, "_invoke", { value: makeInvokeMethod(t, r, c) }), a; } function tryCatch(t, e, r) { try { return { type: "normal", arg: t.call(e, r) }; } catch (t) { return { type: "throw", arg: t }; } } e.wrap = wrap; var h = "suspendedStart", l = "suspendedYield", f = "executing", s = "completed", y = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var p = {}; define(p, a, function () { return this; }); var d = Object.getPrototypeOf, v = d && d(d(values([]))); v && v !== r && n.call(v, a) && (p = v); var g = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(p); function defineIteratorMethods(t) { ["next", "throw", "return"].forEach(function (e) { define(t, e, function (t) { return this._invoke(e, t); }); }); } function AsyncIterator(t, e) { function invoke(r, o, i, a) { var c = tryCatch(t[r], t, o); if ("throw" !== c.type) { var u = c.arg, h = u.value; return h && "object" == _typeof(h) && n.call(h, "__await") ? e.resolve(h.__await).then(function (t) { invoke("next", t, i, a); }, function (t) { invoke("throw", t, i, a); }) : e.resolve(h).then(function (t) { u.value = t, i(u); }, function (t) { return invoke("throw", t, i, a); }); } a(c.arg); } var r; o(this, "_invoke", { value: function value(t, n) { function callInvokeWithMethodAndArg() { return new e(function (e, r) { invoke(t, n, e, r); }); } return r = r ? r.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(e, r, n) { var o = h; return function (i, a) { if (o === f) throw Error("Generator is already running"); if (o === s) { if ("throw" === i) throw a; return { value: t, done: !0 }; } for (n.method = i, n.arg = a;;) { var c = n.delegate; if (c) { var u = maybeInvokeDelegate(c, n); if (u) { if (u === y) continue; return u; } } if ("next" === n.method) n.sent = n._sent = n.arg;else if ("throw" === n.method) { if (o === h) throw o = s, n.arg; n.dispatchException(n.arg); } else "return" === n.method && n.abrupt("return", n.arg); o = f; var p = tryCatch(e, r, n); if ("normal" === p.type) { if (o = n.done ? s : l, p.arg === y) continue; return { value: p.arg, done: n.done }; } "throw" === p.type && (o = s, n.method = "throw", n.arg = p.arg); } }; } function maybeInvokeDelegate(e, r) { var n = r.method, o = e.iterator[n]; if (o === t) return r.delegate = null, "throw" === n && e.iterator["return"] && (r.method = "return", r.arg = t, maybeInvokeDelegate(e, r), "throw" === r.method) || "return" !== n && (r.method = "throw", r.arg = new TypeError("The iterator does not provide a '" + n + "' method")), y; var i = tryCatch(o, e.iterator, r.arg); if ("throw" === i.type) return r.method = "throw", r.arg = i.arg, r.delegate = null, y; var a = i.arg; return a ? a.done ? (r[e.resultName] = a.value, r.next = e.nextLoc, "return" !== r.method && (r.method = "next", r.arg = t), r.delegate = null, y) : a : (r.method = "throw", r.arg = new TypeError("iterator result is not an object"), r.delegate = null, y); } function pushTryEntry(t) { var e = { tryLoc: t[0] }; 1 in t && (e.catchLoc = t[1]), 2 in t && (e.finallyLoc = t[2], e.afterLoc = t[3]), this.tryEntries.push(e); } function resetTryEntry(t) { var e = t.completion || {}; e.type = "normal", delete e.arg, t.completion = e; } function Context(t) { this.tryEntries = [{ tryLoc: "root" }], t.forEach(pushTryEntry, this), this.reset(!0); } function values(e) { if (e || "" === e) { var r = e[a]; if (r) return r.call(e); if ("function" == typeof e.next) return e; if (!isNaN(e.length)) { var o = -1, i = function next() { for (; ++o < e.length;) if (n.call(e, o)) return next.value = e[o], next.done = !1, next; return next.value = t, next.done = !0, next; }; return i.next = i; } } throw new TypeError(_typeof(e) + " is not iterable"); } return GeneratorFunction.prototype = GeneratorFunctionPrototype, o(g, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), o(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, u, "GeneratorFunction"), e.isGeneratorFunction = function (t) { var e = "function" == typeof t && t.constructor; return !!e && (e === GeneratorFunction || "GeneratorFunction" === (e.displayName || e.name)); }, e.mark = function (t) { return Object.setPrototypeOf ? Object.setPrototypeOf(t, GeneratorFunctionPrototype) : (t.__proto__ = GeneratorFunctionPrototype, define(t, u, "GeneratorFunction")), t.prototype = Object.create(g), t; }, e.awrap = function (t) { return { __await: t }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, c, function () { return this; }), e.AsyncIterator = AsyncIterator, e.async = function (t, r, n, o, i) { void 0 === i && (i = Promise); var a = new AsyncIterator(wrap(t, r, n, o), i); return e.isGeneratorFunction(r) ? a : a.next().then(function (t) { return t.done ? t.value : a.next(); }); }, defineIteratorMethods(g), define(g, u, "Generator"), define(g, a, function () { return this; }), define(g, "toString", function () { return "[object Generator]"; }), e.keys = function (t) { var e = Object(t), r = []; for (var n in e) r.push(n); return r.reverse(), function next() { for (; r.length;) { var t = r.pop(); if (t in e) return next.value = t, next.done = !1, next; } return next.done = !0, next; }; }, e.values = values, Context.prototype = { constructor: Context, reset: function reset(e) { if (this.prev = 0, this.next = 0, this.sent = this._sent = t, this.done = !1, this.delegate = null, this.method = "next", this.arg = t, this.tryEntries.forEach(resetTryEntry), !e) for (var r in this) "t" === r.charAt(0) && n.call(this, r) && !isNaN(+r.slice(1)) && (this[r] = t); }, stop: function stop() { this.done = !0; var t = this.tryEntries[0].completion; if ("throw" === t.type) throw t.arg; return this.rval; }, dispatchException: function dispatchException(e) { if (this.done) throw e; var r = this; function handle(n, o) { return a.type = "throw", a.arg = e, r.next = n, o && (r.method = "next", r.arg = t), !!o; } for (var o = this.tryEntries.length - 1; o >= 0; --o) { var i = this.tryEntries[o], a = i.completion; if ("root" === i.tryLoc) return handle("end"); if (i.tryLoc <= this.prev) { var c = n.call(i, "catchLoc"), u = n.call(i, "finallyLoc"); if (c && u) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } else if (c) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); } else { if (!u) throw Error("try statement without catch or finally"); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } } } }, abrupt: function abrupt(t, e) { for (var r = this.tryEntries.length - 1; r >= 0; --r) { var o = this.tryEntries[r]; if (o.tryLoc <= this.prev && n.call(o, "finallyLoc") && this.prev < o.finallyLoc) { var i = o; break; } } i && ("break" === t || "continue" === t) && i.tryLoc <= e && e <= i.finallyLoc && (i = null); var a = i ? i.completion : {}; return a.type = t, a.arg = e, i ? (this.method = "next", this.next = i.finallyLoc, y) : this.complete(a); }, complete: function complete(t, e) { if ("throw" === t.type) throw t.arg; return "break" === t.type || "continue" === t.type ? this.next = t.arg : "return" === t.type ? (this.rval = this.arg = t.arg, this.method = "return", this.next = "end") : "normal" === t.type && e && (this.next = e), y; }, finish: function finish(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.finallyLoc === t) return this.complete(r.completion, r.afterLoc), resetTryEntry(r), y; } }, "catch": function _catch(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.tryLoc === t) { var n = r.completion; if ("throw" === n.type) { var o = n.arg; resetTryEntry(r); } return o; } } throw Error("illegal catch attempt"); }, delegateYield: function delegateYield(e, r, n) { return this.delegate = { iterator: values(e), resultName: r, nextLoc: n }, "next" === this.method && (this.arg = t), y; } }, e; }
+function asyncGeneratorStep(n, t, e, r, o, a, c) { try { var i = n[a](c), u = i.value; } catch (n) { return void e(n); } i.done ? t(u) : Promise.resolve(u).then(r, o); }
+function _asyncToGenerator(n) { return function () { var t = this, e = arguments; return new Promise(function (r, o) { var a = n.apply(t, e); function _next(n) { asyncGeneratorStep(a, r, o, _next, _throw, "next", n); } function _throw(n) { asyncGeneratorStep(a, r, o, _next, _throw, "throw", n); } _next(void 0); }); }; }
 function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
@@ -782,6 +806,60 @@ function TabContainer() {
     _useState2 = _slicedToArray(_useState, 2),
     selectedIndex = _useState2[0],
     setSelectedIndex = _useState2[1];
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+    // the code we want to run
+
+    var fetchInitialTab = /*#__PURE__*/function () {
+      var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+        var response, response2, text, text2, state, state2;
+        return _regeneratorRuntime().wrap(function _callee$(_context) {
+          while (1) switch (_context.prev = _context.next) {
+            case 0:
+              _context.prev = 0;
+              _context.next = 3;
+              return fetch("/data/performance/network");
+            case 3:
+              response = _context.sent;
+              _context.next = 6;
+              return fetch("/data/performance/jfrstate");
+            case 6:
+              response2 = _context.sent;
+              _context.next = 9;
+              return response.json();
+            case 9:
+              text = _context.sent;
+              _context.next = 12;
+              return response2.json();
+            case 12:
+              text2 = _context.sent;
+              state = text.running;
+              state2 = text2.running;
+              if (state === true) setSelectedIndex(0);
+              if (state2 === true) setSelectedIndex(1);
+              _context.next = 22;
+              break;
+            case 19:
+              _context.prev = 19;
+              _context.t0 = _context["catch"](0);
+              console.error("Error fetching state", _context.t0);
+            case 22:
+            case "end":
+              return _context.stop();
+          }
+        }, _callee, null, [[0, 19]]);
+      }));
+      return function fetchInitialTab() {
+        return _ref.apply(this, arguments);
+      };
+    }();
+    fetchInitialTab();
+    // optional return function
+    return function () {
+      console.log("Done");
+    };
+  }, [
+    // tell use effect what to listen/react to in order to run code
+  ]);
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("ul", {
     className: "nav nav-tabs"
   }, tabs.map(function (tab, index) {
@@ -827,7 +905,12 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, `.container {
+___CSS_LOADER_EXPORT___.push([module.id, `.disabled {
+  pointer-events: none; /* Disables mouse events */
+  opacity: 0.5; /* Optional: makes it look disabled */
+}
+
+.container {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -939,6 +1022,24 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.container {
   margin-bottom: 1rem; /* Standard margin size for spacing */
 }
 
+.form-control {
+  display: block;
+  width: 100%;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #212529;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #ced4da;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border-radius: 0.25rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
 .form-select {
   display: block;
   /* width: 100%; */
@@ -946,10 +1047,11 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.container {
   padding: 0.375rem 0.75rem;
   font-size: 1rem;
   line-height: 1.5;
-  color: #495057;
-  background-color: #ffffff;
+  background-color: #429ede;
+  color: #ffffff;
+  font-weight: bold;
   background-clip: padding-box;
-  border: 1px solid #ced4da;
+  border: 1px solid #a5a5a4;
   margin-top: 0;
   margin-bottom: 0;
   appearance: none; /* Remove default styling in some browsers */
@@ -982,7 +1084,8 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.container {
   color: #284f93; /* Text color for active tab */
   font-weight: bold;
   background-color: #fff; /* Background color for active tab */
-  border-color: #dee2e6 #dee2e6 #fff; /*Border color for active tab*/
+  border-color: #f7901e #e6e4de #fff;
+  border-top-width: medium; /*Border color for active tab*/
 }
 
 /* Style for disabled tab */
@@ -1022,7 +1125,8 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.container {
 .alert-danger {
   color: #721c24;
   background-color: #f8d7da;
-  border-color: #f5c6cb;
+  border-color: #721c24;
+  margin-top: 2%;
 }
 
 .alert-danger hr {
@@ -1073,7 +1177,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.container {
   line-height: 1.5; /* Adjusts line height for better readability */
   cursor: pointer; /* Pointer cursor on hover for better UX */
 }
-`, "",{"version":3,"sources":["webpack://./src/components/shark.css"],"names":[],"mappings":"AAAA;EACE,aAAa;EACb,sBAAsB;EACtB,mBAAmB;EACnB,iDAAiD;EACjD,2CAA2C;EAC3C,wCAAwC;AAC1C;;AAEA;EACE,aAAa;EACb,sBAAsB;EACtB,mBAAmB;EACnB,eAAe;EACf;sBACoB;EACpB;wBACsB;EACtB,2DAA2D;EAC3D,mEAAmE;EACnE,yBAAyB,EAAE,oCAAoC;EAC/D,kBAAkB,EAAE,8BAA8B;EAClD,oBAAoB;AACtB;;AAEA;EACE,YAAY;AACd;;AAEA;EACE,yBAAyB,EAAE,2BAA2B;EACtD,YAAY,EAAE,eAAe;EAC7B,YAAY,EAAE,0BAA0B;EACxC,mBAAmB,EAAE,oBAAoB;EACzC,kBAAkB,EAAE,8BAA8B;EAClD,eAAe,EAAE,cAAc;EAC/B,eAAe,EAAE,4BAA4B;EAC7C,YAAY;EACZ,yFAAyF;EACzF,kDAAkD,EAAE,wCAAwC;AAC9F;;AAEA,uBAAuB;AACvB;EACE,yBAAyB,EAAE,0CAA0C;EACrE,6CAA6C,EAAE,0CAA0C;AAC3F;;AAEA;EACE,yBAAyB,EAAE,2BAA2B;EACtD,YAAY,EAAE,eAAe;EAC7B,YAAY,EAAE,0BAA0B;EACxC,mBAAmB,EAAE,oBAAoB;EACzC,kBAAkB,EAAE,8BAA8B;EAClD,eAAe,EAAE,cAAc;EAC/B,YAAY;EACZ,eAAe,EAAE,4BAA4B;EAC7C,4CAA4C,EAAE,2CAA2C;EACzF,kDAAkD,EAAE,wCAAwC;AAC9F;;AAEA;EACE,qBAAqB;EACrB,gBAAgB;EAChB,sBAAsB;EACtB,eAAe;AACjB;;AAEA;EACE,kBAAkB;EAClB,aAAa,EAAE,gDAAgD;EAC/D,iBAAiB,EAAE,sDAAsD;EACzE,mBAAmB,EAAE,6BAA6B;EAClD,cAAc;AAChB;;AAEA;EACE,aAAa,EAAE,yDAAyD;EACxE,mBAAmB,EAAE,mCAAmC;EACxD,yBAAyB,EAAE,mBAAmB;EAC9C,gBAAgB,EAAE,0BAA0B;EAC5C,eAAe,EAAE,cAAc;EAC/B,gBAAgB,EAAE,gBAAgB;EAClC,gBAAgB,EAAE,gBAAgB;EAClC,cAAc,EAAE,eAAe;EAC/B,yBAAyB,EAAE,qBAAqB;EAChD,yBAAyB,EAAE,WAAW;EACtC,uBAAuB,EAAE,kBAAkB;EAC3C,cAAc,EAAE,uBAAuB;EACvC,YAAY;EACZ,iEAAiE;AACnE;;AAEA;EACE,OAAO,EAAE,yCAAyC;EAClD,cAAc,EAAE,uEAAuE;EACvF,wEAAwE;EACxE,yBAAyB,EAAE,gDAAgD;EAC3E,sEAAsE;AACxE;;AAEA,4CAA4C;AAC5C;;EAEE,qBAAqB,EAAE,+BAA+B;EACtD,aAAa,EAAE,4BAA4B;AAC7C;;AAEA;EACE,mBAAmB,EAAE,qCAAqC;AAC5D;;AAEA;EACE,cAAc;EACd,iBAAiB;EACjB,2BAA2B;EAC3B,yBAAyB;EACzB,eAAe;EACf,gBAAgB;EAChB,cAAc;EACd,yBAAyB;EACzB,4BAA4B;EAC5B,yBAAyB;EACzB,aAAa;EACb,gBAAgB;EAChB,gBAAgB,EAAE,4CAA4C;AAChE;;AAEA;EACE,qBAAqB,EAAE,0BAA0B;EACjD,eAAe,EAAE,4BAA4B;EAC7C,gBAAgB,EAAE,0BAA0B;EAC5C,aAAa,EAAE,0BAA0B;AAC3C;;AAEA,oFAAoF;AACpF;EACE,mBAAmB,EAAE,iDAAiD;AACxE;;AAEA,0EAA0E;AAC1E;EACE,cAAc,EAAE,wCAAwC;EACxD,oBAAoB,EAAE,6BAA6B;EACnD,YAAY;EACZ,SAAS,EAAE,mBAAmB;EAC9B,6BAA6B,EAAE,sBAAsB;EACrD,oCAAoC,EAAE,mCAAmC;AAC3E;;AAEA,6BAA6B;AAC7B;EACE,cAAc,EAAE,8BAA8B;EAC9C,iBAAiB;EACjB,sBAAsB,EAAE,oCAAoC;EAC5D,kCAAkC,EAAE,8BAA8B;AACpE;;AAEA,2BAA2B;AAC3B;EACE,cAAc,EAAE,gCAAgC;EAChD,oBAAoB,EAAE,0BAA0B;AAClD;;AAEA;EACE,kBAAkB;EAClB,wBAAwB;EACxB,mBAAmB;EACnB,6BAA6B;EAC7B,uBAAuB;AACzB;;AAEA;EACE,kBAAkB;EAClB,gBAAgB;AAClB;;AAEA;EACE,gBAAgB;AAClB;;AAEA;EACE,qBAAqB;AACvB;;AAEA;EACE,kBAAkB;EAClB,WAAW;EACX,WAAW;EACX,UAAU;AACZ;;AAEA;EACE,cAAc;EACd,yBAAyB;EACzB,qBAAqB;AACvB;;AAEA;EACE,yBAAyB;AAC3B;;AAEA;EACE,qBAAqB;EACrB,WAAW;EACX,YAAY;EACZ,2BAA2B;EAC3B,gCAAgC;EAChC,kBAAkB;EAClB,8BAA8B;EAC9B,6CAA6C;AAC/C;;AAEA;EACE;IACE,qBAAqB;IACrB,UAAU;EACZ;EACA;IACE,mBAAmB;IACnB,YAAY;EACd;EACA;IACE,qBAAqB;IACrB,UAAU;EACZ;AACF;;AAEA;EACE,kBAAkB;EAClB,UAAU;EACV,WAAW;EACX,YAAY;EACZ,UAAU;EACV,gBAAgB;EAChB,sBAAsB;EACtB,SAAS;AACX;;AAEA;EACE,qBAAqB,EAAE,wDAAwD;EAC/E,gBAAgB,EAAE,0BAA0B;EAC5C,gBAAgB,EAAE,uBAAuB;EACzC,gBAAgB,EAAE,+CAA+C;EACjE,eAAe,EAAE,0CAA0C;AAC7D","sourcesContent":[".container {\r\n  display: flex;\r\n  flex-direction: column;\r\n  align-items: center;\r\n  /* justify-content: center; Center horizontally */\r\n  /* align-items: center; Center vertically */\r\n  /* height: 100vh; Full viewport height */\r\n}\r\n\r\n.content {\r\n  display: flex;\r\n  flex-direction: column;\r\n  align-items: center;\r\n  margin-top: 5px;\r\n  /* margin-left: 10%;\r\n  margin-right: 10%; */\r\n  /* padding-left: 20px;\r\n  padding-right: 20px; */\r\n  /* border: 2px solid #f5f5f5; Border around the container */\r\n  /* box-shadow: 0 4px 8px rgba(169, 197, 221, 0.2);  Shadow effect */\r\n  background-color: #ffffff; /*Background color of the container*/\r\n  border-radius: 8px; /* Optional: rounded corners */\r\n  padding-bottom: 40px;\r\n}\r\n\r\n.tabtext {\r\n  color: black;\r\n}\r\n\r\n.startButton {\r\n  background-color: #28a745; /* Green background color */\r\n  color: white; /* Text color */\r\n  border: none; /* Remove default border */\r\n  border-radius: 12px; /* Rounded corners */\r\n  padding: 10px 20px; /* Padding inside the button */\r\n  font-size: 16px; /* Font size */\r\n  cursor: pointer; /* Pointer cursor on hover */\r\n  width: 200px;\r\n  /*box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);  Drop shadow with a lighter green shade */\r\n  transition: background-color 0.3s, box-shadow 0.3s; /* Smooth transition for hover effects */\r\n}\r\n\r\n/* Button hover state */\r\n.button:hover {\r\n  background-color: #34c759; /* Light green background color on hover */\r\n  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.5); /* Slightly more intense shadow on hover */\r\n}\r\n\r\n.stopButton {\r\n  background-color: #521212; /* Green background color */\r\n  color: white; /* Text color */\r\n  border: none; /* Remove default border */\r\n  border-radius: 12px; /* Rounded corners */\r\n  padding: 10px 20px; /* Padding inside the button */\r\n  font-size: 16px; /* Font size */\r\n  width: 200px;\r\n  cursor: pointer; /* Pointer cursor on hover */\r\n  box-shadow: 0 4px 8px rgba(214, 77, 81, 0.3); /* Drop shadow with a lighter green shade */\r\n  transition: background-color 0.3s, box-shadow 0.3s; /* Smooth transition for hover effects */\r\n}\r\n\r\n.form-check-label {\r\n  display: inline-block;\r\n  margin-bottom: 0;\r\n  vertical-align: middle;\r\n  cursor: pointer;\r\n}\r\n\r\n.input-group {\r\n  position: relative;\r\n  display: flex; /* Ensures child elements are aligned in a row */\r\n  flex-wrap: nowrap; /* Prevents wrapping; keeps elements on the same row */\r\n  align-items: center; /* Vertically centers items */\r\n  height: 2.5rem;\r\n}\r\n\r\n.input-group-text {\r\n  display: flex; /* Allows child items to be aligned within this element */\r\n  align-items: center; /* Centers child items vertically */\r\n  padding: 0.375rem 0.75rem; /*Adjusts padding */\r\n  margin-bottom: 0; /* Removes bottom margin */\r\n  font-size: 1rem; /* Font size */\r\n  font-weight: 400; /* Font weight */\r\n  line-height: 1.5; /* Line height */\r\n  color: #495057; /* Text color */\r\n  background-color: #e9ecef; /* Background color */\r\n  border: 1px solid #ced4da; /* Border */\r\n  border-radius: 0.375rem; /* Border radius */\r\n  height: 2.5rem; /* Set a fixed height */\r\n  width: 300px;\r\n  /* Adjust width or flex properties if needed to fit your design */\r\n}\r\n\r\n.input-group input {\r\n  flex: 1; /* Allows input to take remaining space */\r\n  height: 2.5rem; /* Ensure the input field height matches the .input-group-text height */\r\n  /* padding: 0.375rem 0.75rem; Ensure padding matches .input-group-text */\r\n  border: 1px solid #ced4da; /* Match the border style of .input-group-text */\r\n  /* border-radius: 0.375rem; Match border radius of .input-group-text */\r\n}\r\n\r\n/* Optional: Adjust focus and hover states */\r\n.input-group input:focus,\r\n.input-group input:hover {\r\n  border-color: #80bdff; /* Example focus border color */\r\n  outline: none; /* Removes default outline */\r\n}\r\n\r\n.mb-3 {\r\n  margin-bottom: 1rem; /* Standard margin size for spacing */\r\n}\r\n\r\n.form-select {\r\n  display: block;\r\n  /* width: 100%; */\r\n  height: calc(2.25rem + 2px);\r\n  padding: 0.375rem 0.75rem;\r\n  font-size: 1rem;\r\n  line-height: 1.5;\r\n  color: #495057;\r\n  background-color: #ffffff;\r\n  background-clip: padding-box;\r\n  border: 1px solid #ced4da;\r\n  margin-top: 0;\r\n  margin-bottom: 0;\r\n  appearance: none; /* Remove default styling in some browsers */\r\n}\r\n\r\n.nav-tabs {\r\n  list-style-type: none; /* Removes bullet points */\r\n  padding-left: 0; /* Removes default padding */\r\n  margin-bottom: 0; /* Removes bottom margin */\r\n  display: flex; /* Aligns items in a row */\r\n}\r\n\r\n/* Ensure each tab item (usually a <li>) does not have default margins and padding */\r\n.nav-tabs .nav-item {\r\n  margin-bottom: -1px; /* Removes the default margin between tab items */\r\n}\r\n\r\n/* Ensure the individual tab links are displayed as block-level elements */\r\n.nav-tabs .nav-link {\r\n  display: block; /* Makes each tab link a block element */\r\n  padding: 0.5rem 1rem; /* Adjust padding as needed */\r\n  color: black;\r\n  margin: 0; /* Removes margin */\r\n  border: 1px solid transparent; /* Sets border style */\r\n  border-radius: 0.375rem 0.375rem 0 0; /* Adjust border radius as needed */\r\n}\r\n\r\n/* Style for the active tab */\r\n.nav-tabs .nav-link.active {\r\n  color: #284f93; /* Text color for active tab */\r\n  font-weight: bold;\r\n  background-color: #fff; /* Background color for active tab */\r\n  border-color: #dee2e6 #dee2e6 #fff; /*Border color for active tab*/\r\n}\r\n\r\n/* Style for disabled tab */\r\n.nav-tabs .nav-link.disabled {\r\n  color: #6c757d; /* Text color for disabled tab */\r\n  pointer-events: none; /* Disables interactions */\r\n}\r\n\r\n.alert {\r\n  position: relative;\r\n  padding: 0.75rem 1.25rem;\r\n  margin-bottom: 1rem;\r\n  border: 1px solid transparent;\r\n  border-radius: 0.375rem;\r\n}\r\n\r\n.alert-heading {\r\n  font-size: 1.25rem;\r\n  font-weight: 500;\r\n}\r\n\r\n.alert-link {\r\n  font-weight: 500;\r\n}\r\n\r\n.alert-dismissible {\r\n  padding-right: 4.5rem;\r\n}\r\n\r\n.alert-dismissible .btn-close {\r\n  position: absolute;\r\n  top: 0.5rem;\r\n  right: 1rem;\r\n  z-index: 2;\r\n}\r\n\r\n.alert-danger {\r\n  color: #721c24;\r\n  background-color: #f8d7da;\r\n  border-color: #f5c6cb;\r\n}\r\n\r\n.alert-danger hr {\r\n  border-top-color: #f1b0b7;\r\n}\r\n\r\n.spinner-grow {\r\n  display: inline-block;\r\n  width: 2rem;\r\n  height: 2rem;\r\n  vertical-align: text-bottom;\r\n  border: 0.25em solid transparent;\r\n  border-radius: 50%;\r\n  border-top-color: currentColor;\r\n  animation: spinner-grow 0.75s linear infinite;\r\n}\r\n\r\n@keyframes spinner-grow {\r\n  0% {\r\n    transform: scale(0.1);\r\n    opacity: 1;\r\n  }\r\n  50% {\r\n    transform: scale(1);\r\n    opacity: 0.5;\r\n  }\r\n  100% {\r\n    transform: scale(0.1);\r\n    opacity: 0;\r\n  }\r\n}\r\n\r\n.visually-hidden {\r\n  position: absolute;\r\n  width: 1px;\r\n  height: 1px;\r\n  margin: -1px;\r\n  padding: 0;\r\n  overflow: hidden;\r\n  clip: rect(0, 0, 0, 0);\r\n  border: 0;\r\n}\r\n\r\n.form-check-label {\r\n  display: inline-block; /* Makes the label behave like an inline-block element */\r\n  margin-bottom: 0; /* Removes bottom margin */\r\n  font-weight: 400; /* Normal font weight */\r\n  line-height: 1.5; /* Adjusts line height for better readability */\r\n  cursor: pointer; /* Pointer cursor on hover for better UX */\r\n}\r\n"],"sourceRoot":""}]);
+`, "",{"version":3,"sources":["webpack://./src/components/shark.css"],"names":[],"mappings":"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","sourcesContent":[".disabled {\r\n  pointer-events: none; /* Disables mouse events */\r\n  opacity: 0.5; /* Optional: makes it look disabled */\r\n}\r\n\r\n.container {\r\n  display: flex;\r\n  flex-direction: column;\r\n  align-items: center;\r\n  /* justify-content: center; Center horizontally */\r\n  /* align-items: center; Center vertically */\r\n  /* height: 100vh; Full viewport height */\r\n}\r\n\r\n.content {\r\n  display: flex;\r\n  flex-direction: column;\r\n  align-items: center;\r\n  margin-top: 5px;\r\n  /* margin-left: 10%;\r\n  margin-right: 10%; */\r\n  /* padding-left: 20px;\r\n  padding-right: 20px; */\r\n  /* border: 2px solid #f5f5f5; Border around the container */\r\n  /* box-shadow: 0 4px 8px rgba(169, 197, 221, 0.2);  Shadow effect */\r\n  background-color: #ffffff; /*Background color of the container*/\r\n  border-radius: 8px; /* Optional: rounded corners */\r\n  padding-bottom: 40px;\r\n}\r\n\r\n.tabtext {\r\n  color: black;\r\n}\r\n\r\n.startButton {\r\n  background-color: #28a745; /* Green background color */\r\n  color: white; /* Text color */\r\n  border: none; /* Remove default border */\r\n  border-radius: 12px; /* Rounded corners */\r\n  padding: 10px 20px; /* Padding inside the button */\r\n  font-size: 16px; /* Font size */\r\n  cursor: pointer; /* Pointer cursor on hover */\r\n  width: 200px;\r\n  /*box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);  Drop shadow with a lighter green shade */\r\n  transition: background-color 0.3s, box-shadow 0.3s; /* Smooth transition for hover effects */\r\n}\r\n\r\n/* Button hover state */\r\n.button:hover {\r\n  background-color: #34c759; /* Light green background color on hover */\r\n  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.5); /* Slightly more intense shadow on hover */\r\n}\r\n\r\n.stopButton {\r\n  background-color: #521212; /* Green background color */\r\n  color: white; /* Text color */\r\n  border: none; /* Remove default border */\r\n  border-radius: 12px; /* Rounded corners */\r\n  padding: 10px 20px; /* Padding inside the button */\r\n  font-size: 16px; /* Font size */\r\n  width: 200px;\r\n  cursor: pointer; /* Pointer cursor on hover */\r\n  box-shadow: 0 4px 8px rgba(214, 77, 81, 0.3); /* Drop shadow with a lighter green shade */\r\n  transition: background-color 0.3s, box-shadow 0.3s; /* Smooth transition for hover effects */\r\n}\r\n\r\n.form-check-label {\r\n  display: inline-block;\r\n  margin-bottom: 0;\r\n  vertical-align: middle;\r\n  cursor: pointer;\r\n}\r\n\r\n.input-group {\r\n  position: relative;\r\n  display: flex; /* Ensures child elements are aligned in a row */\r\n  flex-wrap: nowrap; /* Prevents wrapping; keeps elements on the same row */\r\n  align-items: center; /* Vertically centers items */\r\n  height: 2.5rem;\r\n}\r\n\r\n.input-group-text {\r\n  display: flex; /* Allows child items to be aligned within this element */\r\n  align-items: center; /* Centers child items vertically */\r\n  padding: 0.375rem 0.75rem; /*Adjusts padding */\r\n  margin-bottom: 0; /* Removes bottom margin */\r\n  font-size: 1rem; /* Font size */\r\n  font-weight: 400; /* Font weight */\r\n  line-height: 1.5; /* Line height */\r\n  color: #495057; /* Text color */\r\n  background-color: #e9ecef; /* Background color */\r\n  border: 1px solid #ced4da; /* Border */\r\n  border-radius: 0.375rem; /* Border radius */\r\n  height: 2.5rem; /* Set a fixed height */\r\n  width: 300px;\r\n  /* Adjust width or flex properties if needed to fit your design */\r\n}\r\n\r\n.input-group input {\r\n  flex: 1; /* Allows input to take remaining space */\r\n  height: 2.5rem; /* Ensure the input field height matches the .input-group-text height */\r\n  /* padding: 0.375rem 0.75rem; Ensure padding matches .input-group-text */\r\n  border: 1px solid #ced4da; /* Match the border style of .input-group-text */\r\n  /* border-radius: 0.375rem; Match border radius of .input-group-text */\r\n}\r\n\r\n/* Optional: Adjust focus and hover states */\r\n.input-group input:focus,\r\n.input-group input:hover {\r\n  border-color: #80bdff; /* Example focus border color */\r\n  outline: none; /* Removes default outline */\r\n}\r\n\r\n.mb-3 {\r\n  margin-bottom: 1rem; /* Standard margin size for spacing */\r\n}\r\n\r\n.form-control {\r\n  display: block;\r\n  width: 100%;\r\n  padding: 0.375rem 0.75rem;\r\n  font-size: 1rem;\r\n  font-weight: 400;\r\n  line-height: 1.5;\r\n  color: #212529;\r\n  background-color: #fff;\r\n  background-clip: padding-box;\r\n  border: 1px solid #ced4da;\r\n  -webkit-appearance: none;\r\n  -moz-appearance: none;\r\n  appearance: none;\r\n  border-radius: 0.25rem;\r\n  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;\r\n}\r\n\r\n.form-select {\r\n  display: block;\r\n  /* width: 100%; */\r\n  height: calc(2.25rem + 2px);\r\n  padding: 0.375rem 0.75rem;\r\n  font-size: 1rem;\r\n  line-height: 1.5;\r\n  background-color: #429ede;\r\n  color: #ffffff;\r\n  font-weight: bold;\r\n  background-clip: padding-box;\r\n  border: 1px solid #a5a5a4;\r\n  margin-top: 0;\r\n  margin-bottom: 0;\r\n  appearance: none; /* Remove default styling in some browsers */\r\n}\r\n\r\n.nav-tabs {\r\n  list-style-type: none; /* Removes bullet points */\r\n  padding-left: 0; /* Removes default padding */\r\n  margin-bottom: 0; /* Removes bottom margin */\r\n  display: flex; /* Aligns items in a row */\r\n}\r\n\r\n/* Ensure each tab item (usually a <li>) does not have default margins and padding */\r\n.nav-tabs .nav-item {\r\n  margin-bottom: -1px; /* Removes the default margin between tab items */\r\n}\r\n\r\n/* Ensure the individual tab links are displayed as block-level elements */\r\n.nav-tabs .nav-link {\r\n  display: block; /* Makes each tab link a block element */\r\n  padding: 0.5rem 1rem; /* Adjust padding as needed */\r\n  color: black;\r\n  margin: 0; /* Removes margin */\r\n  border: 1px solid transparent; /* Sets border style */\r\n  border-radius: 0.375rem 0.375rem 0 0; /* Adjust border radius as needed */\r\n}\r\n\r\n/* Style for the active tab */\r\n.nav-tabs .nav-link.active {\r\n  color: #284f93; /* Text color for active tab */\r\n  font-weight: bold;\r\n  background-color: #fff; /* Background color for active tab */\r\n  border-color: #f7901e #e6e4de #fff;\r\n  border-top-width: medium; /*Border color for active tab*/\r\n}\r\n\r\n/* Style for disabled tab */\r\n.nav-tabs .nav-link.disabled {\r\n  color: #6c757d; /* Text color for disabled tab */\r\n  pointer-events: none; /* Disables interactions */\r\n}\r\n\r\n.alert {\r\n  position: relative;\r\n  padding: 0.75rem 1.25rem;\r\n  margin-bottom: 1rem;\r\n  border: 1px solid transparent;\r\n  border-radius: 0.375rem;\r\n}\r\n\r\n.alert-heading {\r\n  font-size: 1.25rem;\r\n  font-weight: 500;\r\n}\r\n\r\n.alert-link {\r\n  font-weight: 500;\r\n}\r\n\r\n.alert-dismissible {\r\n  padding-right: 4.5rem;\r\n}\r\n\r\n.alert-dismissible .btn-close {\r\n  position: absolute;\r\n  top: 0.5rem;\r\n  right: 1rem;\r\n  z-index: 2;\r\n}\r\n\r\n.alert-danger {\r\n  color: #721c24;\r\n  background-color: #f8d7da;\r\n  border-color: #721c24;\r\n  margin-top: 2%;\r\n}\r\n\r\n.alert-danger hr {\r\n  border-top-color: #f1b0b7;\r\n}\r\n\r\n.spinner-grow {\r\n  display: inline-block;\r\n  width: 2rem;\r\n  height: 2rem;\r\n  vertical-align: text-bottom;\r\n  border: 0.25em solid transparent;\r\n  border-radius: 50%;\r\n  border-top-color: currentColor;\r\n  animation: spinner-grow 0.75s linear infinite;\r\n}\r\n\r\n@keyframes spinner-grow {\r\n  0% {\r\n    transform: scale(0.1);\r\n    opacity: 1;\r\n  }\r\n  50% {\r\n    transform: scale(1);\r\n    opacity: 0.5;\r\n  }\r\n  100% {\r\n    transform: scale(0.1);\r\n    opacity: 0;\r\n  }\r\n}\r\n\r\n.visually-hidden {\r\n  position: absolute;\r\n  width: 1px;\r\n  height: 1px;\r\n  margin: -1px;\r\n  padding: 0;\r\n  overflow: hidden;\r\n  clip: rect(0, 0, 0, 0);\r\n  border: 0;\r\n}\r\n\r\n.form-check-label {\r\n  display: inline-block; /* Makes the label behave like an inline-block element */\r\n  margin-bottom: 0; /* Removes bottom margin */\r\n  font-weight: 400; /* Normal font weight */\r\n  line-height: 1.5; /* Adjusts line height for better readability */\r\n  cursor: pointer; /* Pointer cursor on hover for better UX */\r\n}\r\n"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

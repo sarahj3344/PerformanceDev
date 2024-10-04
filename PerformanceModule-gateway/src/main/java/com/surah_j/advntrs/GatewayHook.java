@@ -1,23 +1,29 @@
 package com.surah_j.advntrs;
 
 import com.inductiveautomation.ignition.common.licensing.LicenseState;
+import com.inductiveautomation.ignition.common.script.ScriptManager;
+import com.inductiveautomation.ignition.common.script.hints.PropertiesFileDocProvider;
+import com.inductiveautomation.ignition.gateway.clientcomm.ClientReqSession;
 import com.inductiveautomation.ignition.gateway.dataroutes.RouteGroup;
 import com.inductiveautomation.ignition.gateway.model.AbstractGatewayModuleHook;
 import com.inductiveautomation.ignition.gateway.model.GatewayContext;
 import com.inductiveautomation.ignition.gateway.web.models.*;
 import com.inductiveautomation.ignition.gateway.web.pages.BasicReactPanel;
 import com.inductiveautomation.ignition.gateway.web.pages.status.StatusCategories;
-import com.surah_j.advntrs.web.BabySharkRoutes;
-import com.surah_j.advntrs.web.FlightRecordingRoutes;
+import com.sun.jna.NativeLibrary;
+import com.sun.jna.Platform;
+import com.surah_j.advntrs.web.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.pcap4j.core.*;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.*;
 
 import com.inductiveautomation.ignition.common.BundleUtil;
 import com.surah_j.advntrs.records.PerformanceSettingsRecord;
-import com.surah_j.advntrs.web.PerformanceSettingsPage;
 import com.inductiveautomation.ignition.gateway.localdb.persistence.IRecordListener;
 import com.inductiveautomation.ignition.gateway.web.components.AbstractNamedTab;
 import com.inductiveautomation.ignition.gateway.web.components.ConfigPanel;
@@ -28,9 +34,10 @@ import com.inductiveautomation.ignition.gateway.web.models.IConfigTab;
 
 public class GatewayHook extends AbstractGatewayModuleHook {
 
-    private GatewayContext context;
+    public static GatewayContext context;
 
     private final Logger log = LoggerFactory.getLogger(getClass().getSimpleName());
+//    private final GatewayScriptModule scriptModule = new GatewayScriptModule();
 
     /**
      * This sets up the status panel which we'll add to the statusPanels list. The controller will be
@@ -124,6 +131,9 @@ public class GatewayHook extends AbstractGatewayModuleHook {
             }
         });
 
+        context.getDiagnosticsManager().addContributor(new DiagnosticsManagerImpl$JfrFileContributor(context));
+        context.getDiagnosticsManager().addContributor(new DiagnosticsManagerImpl$PcapFileContributor(context));
+
         log.debug("Setup Complete.");
     }
 
@@ -201,4 +211,20 @@ public class GatewayHook extends AbstractGatewayModuleHook {
     public List<? extends INamedTab> getStatusPanels() {
         return Collections.singletonList(PERFORMANCE_STATUS_PAGE);
     }
+
+//    @Override
+//    public void initializeScriptManager(ScriptManager manager) {
+//        super.initializeScriptManager(manager);
+//
+//        manager.addScriptModule(
+//                "system.performance",
+//                scriptModule,
+//                new PropertiesFileDocProvider());
+//    }
+
+//    @Override
+//    public Object getRPCHandler(ClientReqSession session, String projectName) {
+//        return scriptModule;
+//    }
+
 }

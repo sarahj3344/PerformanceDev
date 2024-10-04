@@ -75,7 +75,7 @@
                     <moduleName>Performance Module</moduleName>
                     <moduleDescription>Support Performance Testing</moduleDescription>
                     <moduleVersion>1.1.32</moduleVersion>
-                    <requiredIgnitionVersion>8.1.32</requiredIgnitionVersion>
+                    <requiredIgnitionVersion>8.1.5</requiredIgnitionVersion>
                     <requiredFrameworkVersion>6</requiredFrameworkVersion>
 
                     <hooks>

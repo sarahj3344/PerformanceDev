@@ -32,11 +32,14 @@ import javax.servlet.http.HttpServletResponse;
 
 public class BabySharkCollector {
 
+    GatewayContext context;
     private String dev;
     private String ip;
     private String port;
     private String filter;
+    private String protocolFilter;
     private String subsystem;
+    private Boolean logging;
     private String connectionName;
     private PcapDumper dump;
     private Thread captureThread;
@@ -73,12 +76,31 @@ public class BabySharkCollector {
             if (i > 0) {
                 json.append(",");
             }
+
+            // Display the IP address of the NIC
+            String addresses = info.getAddresses().toString();
+            String template = "address: [/";
+            String ipAddress = "Unavailable";
+            int start = addresses.indexOf("address: [/") + template.length();
+            int end = addresses.indexOf("]", start);
+            if (end != -1){
+                ipAddress = addresses.substring(start, end);
+                log.trace(ipAddress);
+            }
             json.append("{")
-                    .append("\"name\":\"").append(info.getName()).append("\",")
-                    .append("\"description\":\"").append(info.getDescription()).append("\"")
+                    .append("\"name\":\"")
+                    .append(info.getName())
+                    .append("\",")
+                    .append("\"description\":\"")
+                    .append(info.getDescription())
+                    .append(", NIC: ")
+                    .append(ipAddress)
+                    .append("\"")
                     .append("}");
         }
         json.append("]");
+
+        log.trace(json.toString());
 
         JSONArray nifArray = new JSONArray(json.toString());
         JSONObject nifs = new JSONObject();
@@ -89,6 +111,8 @@ public class BabySharkCollector {
     // returns the network interface object based on the name
     public PcapNetworkInterface setNif(String name) throws PcapNativeException {
         this.dev = name;
+        log.trace(name);
+        log.trace(Pcaps.getDevByName(dev).toString());
         return Pcaps.getDevByName(dev);
     }
 
@@ -98,16 +122,16 @@ public class BabySharkCollector {
         dev = body.getString("device");
         ip = body.getString("ip");
         port = body.getString("port");
-        filter = body.getString("filter");
+        logging = body.getBoolean("logging");
+        protocolFilter = body.getString("filter");
     }
 
     // queries the settings record to get the snapshot length and timeout.
     // Also queries the idb for devices.
-    public JSONObject persistentRecs(RequestContext request) throws JSONException {
-        reqContext = request;
-        GatewayContext context = request.getGatewayContext();
+    public JSONObject persistentRecs(RequestContext reqContext) throws JSONException {
+        this.reqContext = reqContext;
         JSONObject json = new JSONObject();
-        PersistenceSession session = context.getPersistenceInterface().getSession();
+        PersistenceSession session = reqContext.getGatewayContext().getPersistenceInterface().getSession();
         List<Map> results;
 
         try {
@@ -142,6 +166,7 @@ public class BabySharkCollector {
     public void createHandle(PcapNetworkInterface device, JSONObject persistentRecs) throws JSONException, PcapNativeException {
         int SnapshotLength = persistentRecs.getInt("Snapshot Length");
         int timeout = persistentRecs.getInt("Read Timeout");
+        device = setNif(dev);
         handle = device.openLive(SnapshotLength, PcapNetworkInterface.PromiscuousMode.PROMISCUOUS, timeout);
     }
 
@@ -157,7 +182,7 @@ public class BabySharkCollector {
         PersistenceSession session = context.getPersistenceInterface().getSession();
         try {
             if(subsystem.contains("Driver")){
-            results = session.rawQueryMaps(("SELECT NAME FROM " + table + " JOIN DEVICESETTINGS ON DEVICESETTINGSID = DEVICESETTINGS_ID"), true);
+                results = session.rawQueryMaps(("SELECT NAME FROM " + table + " JOIN DEVICESETTINGS ON DEVICESETTINGSID = DEVICESETTINGS_ID"), true);
             }
             if(subsystem.contains("SMTP")){
                 results = session.rawQueryMaps(("SELECT NAME FROM " + "EMAILPROFILES"), true);
@@ -171,15 +196,28 @@ public class BabySharkCollector {
 
     // if a filter passed from UI, sets filter on handle
     public void setFilter() throws NotOpenException, PcapNativeException {
+        filter = "";
         if (!ip.isEmpty()) {
             filter = "host " + ip + " ";
-            if (!port.isEmpty()) {
+            if (!port.isEmpty() || !protocolFilter.isEmpty()) {
                 filter = filter + "and ";
             }
         }
-        if (!port.isEmpty()) filter = filter + "port " + port + " ";
 
-        if (filter != null && !filter.isEmpty()) {
+        if (!port.isEmpty()){
+            filter = filter + "port " + port + " ";
+            if(!protocolFilter.isEmpty()){
+                filter = filter + "and ";
+            }
+        }
+
+        if(!protocolFilter.isEmpty()){
+            filter = filter + protocolFilter;
+        }
+
+//        log.info("FILTER: " + filter);
+
+        if (!filter.isEmpty()) {
             handle.setFilter(filter, BpfProgram.BpfCompileMode.OPTIMIZE);
         }
     }
@@ -197,11 +235,11 @@ public class BabySharkCollector {
     }
 
     // starts capture
-    public void capture(HttpServletResponse response) throws IOException, NotOpenException, PcapNativeException {
+    public void capture() throws IOException, NotOpenException, PcapNativeException {
         LocalDateTime currentDate = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMddHHmmss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd_HHmmss");
         String formattedDate = currentDate.format(formatter);
-        String responseBody;
+//        String responseBody;
         String filename = "pcapCapture_" + formattedDate + ".pcap";
 
         File directory = reqContext.getGatewayContext().getSystemManager().getLogsDir();
@@ -245,11 +283,13 @@ public class BabySharkCollector {
             captureThread.start();
 
             // sets MDC key on device
-            setLogging(Level.TRACE);
+            if(logging){
+                setLogging(Level.TRACE);
+            }
             log.info("Capture started");
-            responseBody = "Capture started";
-            response.setContentLength(responseBody.length());
-            response.getWriter().write(responseBody);
+//            responseBody = "Capture started";
+//            response.setContentLength(responseBody.length());
+//            response.getWriter().write(responseBody)
         }
     }
 
@@ -260,37 +300,38 @@ public class BabySharkCollector {
         return capturing.get();
     }
 
+    public void setCapturing(Boolean value){
+        capturing.set(value);
+    }
+
     // ends capture
-    public void endCapture(HttpServletResponse response) throws IOException, NotOpenException {
+    public void endCapture() throws IOException, NotOpenException {
         String responseBody;
 
-        if (!capturing.get()) {
-            responseBody = "No capture running";
-            response.setContentLength(responseBody.length());
-            response.getWriter().write(responseBody);
-        }
+//        if (!capturing.get()) {
+//            responseBody = "No capture running";
+//            response.setContentLength(responseBody.length());
+//            response.getWriter().write(responseBody);
+//        }
         capturing.set(false);
         log.info("Capturing set to false");
 
         // stops capture thread
         if (captureThread != null) captureThread.interrupt();
         log.info("Capture thread interrupted");
-        CompletableFuture.runAsync(() -> {
-            try {
-                if (handle != null) {
-                    log.info("Breaking loop to end capture...");
-                    handle.breakLoop();
-                    log.info("Closing handle...");
-                    handle.close();
-                }
-            } catch (Exception e) {
-                // Handle exception
-                log.info("Exception thrown");
+//        CompletableFuture.runAsync(() -> {
+        try {
+            if (handle != null) {
+                log.info("Breaking loop to end capture...");
+                handle.breakLoop();
+                dump.close();
+                log.info("Closing handle...");
+                handle.close();
             }
-        }).exceptionally(e -> {
-            // Log exception
-            return null;
-        });
+        } catch (Exception e) {
+            // Handle exception
+            log.info("Exception thrown");
+        }
 
         removeLogging();
         cleanup();
@@ -300,10 +341,9 @@ public class BabySharkCollector {
         port = null;
         subsystem = null;
         dev = null;
+        logging = false;
+        filter = "";
 
-        responseBody = "Capture stopped";
-        response.setContentLength(responseBody.length());
-        response.getWriter().write(responseBody);
     }
 
 
