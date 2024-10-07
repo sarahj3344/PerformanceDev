@@ -50,4 +50,10 @@ public abstract class SubsystemBase {
 
     public abstract List<Map> getConnectionNames(PersistenceSession session);
 
+    public abstract JSONObject configureSettings(PersistenceSession session) throws JSONException;
+
+    public abstract void setLogging(String connectionName);
+
+    public abstract void clearLogging();
+
 }

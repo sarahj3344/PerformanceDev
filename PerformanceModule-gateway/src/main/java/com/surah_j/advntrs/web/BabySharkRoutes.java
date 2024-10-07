@@ -96,6 +96,7 @@ public class BabySharkRoutes {
 
     public Object startCapture(RequestContext request, HttpServletResponse response) throws IOException, JSONException, PcapNativeException, NotOpenException {
         // Get the writer to send response
+        log.info("START TRIGGERED");
         try{
             if(!Nemo.isCapturing()){
                 log.trace("In start capture block");
@@ -103,9 +104,13 @@ public class BabySharkRoutes {
                 JSONObject body = new JSONObject(req);
                 log.trace(body.toString());
                 Nemo.setProperties(body);
+                log.trace("Properties set");
                 JSONObject settingsRec = Nemo.persistentRecs(request);
+                log.trace("Settings configured");
                 PcapNetworkInterface device = Nemo.setNif(body.get("device").toString().replace("\\\\", "\\"));
+                log.trace("Device created");
                 Nemo.createHandle(device, settingsRec);
+                log.trace("Handle created");
                 Nemo.setFilter();
                 Nemo.capture();
             }

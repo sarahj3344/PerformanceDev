@@ -7,6 +7,7 @@ import com.inductiveautomation.ignition.gateway.dataroutes.RequestContext;
 import com.inductiveautomation.ignition.gateway.localdb.persistence.PersistenceSession;
 import com.inductiveautomation.ignition.gateway.model.GatewayContext;
 import com.surah_j.advntrs.DiagnosticsManagerImpl$PcapFileContributor;
+import com.surah_j.advntrs.GatewayHook;
 import com.surah_j.advntrs.SubsystemHandler.SubsystemBase;
 import com.surah_j.advntrs.SubsystemHandler.SubsystemHandlerFactory;
 import com.surah_j.advntrs.records.PerformanceSettingsRecord;
@@ -129,35 +130,13 @@ public class BabySharkCollector {
     // Also queries the idb for devices.
     public JSONObject persistentRecs(RequestContext reqContext) throws JSONException {
         this.reqContext = reqContext;
+        log.trace("In Persistent Records method");
         JSONObject json = new JSONObject();
         PersistenceSession session = reqContext.getGatewayContext().getPersistenceInterface().getSession();
-        List<Map> results;
 
-        try {
-            SQuery<PerformanceSettingsRecord> query = new SQuery<>(PerformanceSettingsRecord.META);
-            List<PerformanceSettingsRecord> settings = session.query(query);
-            JSONArray jsonArray = new JSONArray();
-            json.put("settings", jsonArray);
-            JSONObject settingsJson = new JSONObject();
-            for (PerformanceSettingsRecord record : settings) {
-                if (record != null) {
-                    jsonArray.put(settingsJson);
-                    settingsJson.put("Snapshot Length", record.getSnapshotLength());
-                    settingsJson.put("Read Timeout", record.getReadTimeout());
-                }
-            }
-
-            if (subsystem != null && !subsystem.isEmpty()) {
-                results = session.rawQueryMaps(("SELECT HOSTNAME, PORT FROM " + recordsMap.get(subsystem)), true);
-                settingsJson.put("IP", results.get(0).get("HOSTNAME"));
-                settingsJson.put("Port", results.get(0).get("PORT"));
-                this.ip = settingsJson.getString("IP");
-                this.port = settingsJson.getString("Port");
-            }
-            json = settingsJson;
-        } finally {
-            session.close();
-        }
+        log.trace("Starting query for records");
+        SubsystemBase handler = SubsystemHandlerFactory.getHandler(subsystem);
+        json = handler.configureSettings(session);
         return json;
     }
 
@@ -171,27 +150,14 @@ public class BabySharkCollector {
 
     // If device selected, queries the internal database for device information
     public List<Map> connectionDetails(RequestContext request) throws SQLException, IOException, JSONException {
-//        setRecordsMap();
         List<Map> results = new ArrayList<>();
         String req = request.readBody();
         JSONObject body = new JSONObject(req);
         this.subsystem = body.getString("table");
-//        String table = recordsMap.get(subsystem);
         GatewayContext context = request.getGatewayContext();
         PersistenceSession session = context.getPersistenceInterface().getSession();
         SubsystemBase handler = SubsystemHandlerFactory.getHandler(subsystem);
         results = handler.getConnectionNames(session);
-
-//        try {
-//            if(subsystem.contains("Driver")){
-//            results = session.rawQueryMaps(("SELECT NAME FROM " + table + " JOIN DEVICESETTINGS ON DEVICESETTINGSID = DEVICESETTINGS_ID"), true);
-//            }
-//            if(subsystem.contains("SMTP")){
-//                results = session.rawQueryMaps(("SELECT NAME FROM " + "EMAILPROFILES"), true);
-//            }
-//        } finally {
-//            session.close();
-//        }
 
         return results;
     }
@@ -243,8 +209,8 @@ public class BabySharkCollector {
         String formattedDate = currentDate.format(formatter);
 //        String responseBody;
         String filename = "pcapCapture_" + formattedDate + ".pcap";
-
-        File directory = reqContext.getGatewayContext().getSystemManager().getLogsDir();
+        GatewayContext context = GatewayHook.context;
+        File directory = context.getSystemManager().getLogsDir();
         File file = new File(directory, filename);
 
         if (!capturing.get()) {
@@ -286,7 +252,8 @@ public class BabySharkCollector {
 
             // sets MDC key on device
             if(logging){
-                setLogging(Level.TRACE);
+                SubsystemBase handler = SubsystemHandlerFactory.getHandler(subsystem);
+                handler.setLogging(connectionName);
             }
             log.info("Capture started");
 //            responseBody = "Capture started";
@@ -346,6 +313,7 @@ public class BabySharkCollector {
         ip = null;
         port = null;
         subsystem = null;
+        connectionName = "";
         dev = null;
         logging = false;
         filter = "";
@@ -357,7 +325,7 @@ public class BabySharkCollector {
 
 
     public void removeLogging() {
-        GatewayContext context = reqContext.getGatewayContext();
+        GatewayContext context = GatewayHook.context;
         log.info("Changing logging level");
         context.getLoggingManager().clearPropertyLevels();
     }
@@ -375,7 +343,8 @@ public class BabySharkCollector {
         int daysOld = 1;
         int maxFiles = 3;
         Instant cutoffDate = Instant.now().minus(daysOld, ChronoUnit.DAYS);
-        File directory = reqContext.getGatewayContext().getSystemManager().getLogsDir();
+        GatewayContext context = GatewayHook.context;
+        File directory = context.getSystemManager().getLogsDir();
 
         // Comparator for comparing file modification times
         Comparator<Path> comparator = Comparator.comparingLong(path -> {
