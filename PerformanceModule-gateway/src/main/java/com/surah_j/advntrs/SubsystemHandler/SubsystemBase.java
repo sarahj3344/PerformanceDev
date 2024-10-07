@@ -43,14 +43,15 @@ public abstract class SubsystemBase {
     public final Map<String, String> recordsMap = Map.of(
             "Modbus TCP Driver", "MODBUSTCPDRIVERSETTINGS",
             "Logix Driver", "LOGIXDRIVERSETTINGS",
-            "DNP3 Driver", "DNP3DRIVERSETTINGS",
-            "SMTP", "CLASSICSMTPEMAILPROFILES",
-            "Database", "DATASOURCES"
+            "DNP3 Driver", "DNP3DEVICESETTINGS",
+            "Classic SMTP", "CLASSICSMTPEMAILPROFILES",
+            "Database", "DATASOURCES",
+            "OPCUA Connections", "OPCUACONNECTIONSETTINGS"
     );
 
     public abstract List<Map> getConnectionNames(PersistenceSession session);
 
-    public abstract JSONObject configureSettings(PersistenceSession session) throws JSONException;
+    public abstract JSONObject configureSettings(PersistenceSession session, String connectionName) throws JSONException;
 
     public abstract void setLogging(String connectionName);
 

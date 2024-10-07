@@ -43,7 +43,7 @@ public class ModbusHandler extends SubsystemBase {
     }
 
     @Override
-    public JSONObject configureSettings(PersistenceSession session) throws JSONException {
+    public JSONObject configureSettings(PersistenceSession session, String connectionName) throws JSONException {
         List<Map> results;
         JSONObject json = new JSONObject();
 
@@ -64,7 +64,11 @@ public class ModbusHandler extends SubsystemBase {
 
             log.trace("Starting query for device connection");
             if (subsystem != null && !subsystem.isEmpty()) {
-                results = session.rawQueryMaps(("SELECT HOSTNAME, PORT FROM " + recordsMap.get(subsystem)), true);
+                String queryString = "SELECT NAME, HOSTNAME, PORT FROM " + recordsMap.get(subsystem) +
+                        " JOIN DEVICESETTINGS ON DEVICESETTINGSID = DEVICESETTINGS_ID" +
+                        " WHERE NAME = '" + connectionName + "'";
+                log.info(queryString);
+                results = session.rawQueryMaps((queryString), true);
                 settingsJson.put("IP", results.get(0).get("HOSTNAME"));
                 settingsJson.put("Port", results.get(0).get("PORT"));
                 settingsJson.put("Filter", "host " + results.get(0).get("HOSTNAME") + " and port " + results.get(0).get("PORT"));
@@ -79,9 +83,7 @@ public class ModbusHandler extends SubsystemBase {
     @Override
     public void setLogging(String connectionName) {
         log.info("Changing logging level for " + connectionName + " MDC Key");
-        if(subsystem.contains("Driver")){
-            context.getLoggingManager().setPropertyLevel("device-name", connectionName, Level.TRACE);
-        }
+        context.getLoggingManager().setPropertyLevel("device-name", connectionName, Level.TRACE);
     }
 
     @Override

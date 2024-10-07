@@ -136,7 +136,7 @@ public class BabySharkCollector {
 
         log.trace("Starting query for records");
         SubsystemBase handler = SubsystemHandlerFactory.getHandler(subsystem);
-        settings = handler.configureSettings(session);
+        settings = handler.configureSettings(session, connectionName);
         return settings;
     }
 
