@@ -10,15 +10,9 @@ import com.inductiveautomation.ignition.gateway.model.GatewayContext;
 import com.inductiveautomation.ignition.gateway.web.models.*;
 import com.inductiveautomation.ignition.gateway.web.pages.BasicReactPanel;
 import com.inductiveautomation.ignition.gateway.web.pages.status.StatusCategories;
-import com.sun.jna.Library;
-import com.sun.jna.Native;
 import com.surah_j.advntrs.web.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.sun.jna.Library;
-import com.sun.jna.Native;
-import com.sun.jna.NativeLibrary;
 
 import java.sql.SQLException;
 import java.util.*;
@@ -134,8 +128,6 @@ public class GatewayHook extends AbstractGatewayModuleHook {
 
         context.getDiagnosticsManager().addContributor(new DiagnosticsManagerImpl$JfrFileContributor(context));
         context.getDiagnosticsManager().addContributor(new DiagnosticsManagerImpl$PcapFileContributor(context));
-        NativeLibrary.addSearchPath("libpcap.so.2.44", "usr/lib/x86_64-linux-gnu/");
-        log.info("Added search path!");
 
         log.debug("Setup Complete.");
     }

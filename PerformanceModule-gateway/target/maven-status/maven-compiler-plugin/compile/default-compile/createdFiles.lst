@@ -1,3 +1,4 @@
+com\surah_j\advntrs\SubsystemHandler\SubsystemBase.class
 com\surah_j\advntrs\web\BabySharkCollector$1.class
 com\surah_j\advntrs\web\BabySharkCollector.class
 com\surah_j\advntrs\GatewayHook$2.class
@@ -15,3 +16,5 @@ com\surah_j\advntrs\scripting\AbstractScriptModule.class
 com\surah_j\advntrs\scripting\Performance.class
 com\surah_j\advntrs\GatewayScriptModule.class
 com\surah_j\advntrs\GatewayHook.class
+com\surah_j\advntrs\SubsystemHandler\SubsystemHandlerFactory.class
+com\surah_j\advntrs\SubsystemHandler\ModbusHandler.class

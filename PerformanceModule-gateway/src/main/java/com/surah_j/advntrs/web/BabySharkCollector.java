@@ -7,6 +7,8 @@ import com.inductiveautomation.ignition.gateway.dataroutes.RequestContext;
 import com.inductiveautomation.ignition.gateway.localdb.persistence.PersistenceSession;
 import com.inductiveautomation.ignition.gateway.model.GatewayContext;
 import com.surah_j.advntrs.DiagnosticsManagerImpl$PcapFileContributor;
+import com.surah_j.advntrs.SubsystemHandler.SubsystemBase;
+import com.surah_j.advntrs.SubsystemHandler.SubsystemHandlerFactory;
 import com.surah_j.advntrs.records.PerformanceSettingsRecord;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -169,24 +171,27 @@ public class BabySharkCollector {
 
     // If device selected, queries the internal database for device information
     public List<Map> connectionDetails(RequestContext request) throws SQLException, IOException, JSONException {
-        setRecordsMap();
+//        setRecordsMap();
         List<Map> results = new ArrayList<>();
         String req = request.readBody();
         JSONObject body = new JSONObject(req);
         this.subsystem = body.getString("table");
-        String table = recordsMap.get(subsystem);
+//        String table = recordsMap.get(subsystem);
         GatewayContext context = request.getGatewayContext();
         PersistenceSession session = context.getPersistenceInterface().getSession();
-        try {
-            if(subsystem.contains("Driver")){
-            results = session.rawQueryMaps(("SELECT NAME FROM " + table + " JOIN DEVICESETTINGS ON DEVICESETTINGSID = DEVICESETTINGS_ID"), true);
-            }
-            if(subsystem.contains("SMTP")){
-                results = session.rawQueryMaps(("SELECT NAME FROM " + "EMAILPROFILES"), true);
-            }
-        } finally {
-            session.close();
-        }
+        SubsystemBase handler = SubsystemHandlerFactory.getHandler(subsystem);
+        results = handler.getConnectionNames(session);
+
+//        try {
+//            if(subsystem.contains("Driver")){
+//            results = session.rawQueryMaps(("SELECT NAME FROM " + table + " JOIN DEVICESETTINGS ON DEVICESETTINGSID = DEVICESETTINGS_ID"), true);
+//            }
+//            if(subsystem.contains("SMTP")){
+//                results = session.rawQueryMaps(("SELECT NAME FROM " + "EMAILPROFILES"), true);
+//            }
+//        } finally {
+//            session.close();
+//        }
 
         return results;
     }

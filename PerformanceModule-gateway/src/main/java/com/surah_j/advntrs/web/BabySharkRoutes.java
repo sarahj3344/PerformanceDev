@@ -9,15 +9,6 @@ import com.inductiveautomation.ignition.gateway.dataroutes.RouteGroup;
 import com.inductiveautomation.ignition.gateway.dataroutes.WicketAccessControl;
 import com.inductiveautomation.ignition.gateway.model.GatewayContext;
 
-import com.sun.jna.Library;
-import com.sun.jna.Native;
-import com.sun.jna.NativeLibrary;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.lang.Runtime;
-import java.lang.System;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -81,7 +72,6 @@ public class BabySharkRoutes {
         JSONArray nifs = Nemo.getNIFs();
         JSONObject state = new JSONObject();
         state.put("nifs", nifs);
-
 
         // get running state
         String running = "false";
