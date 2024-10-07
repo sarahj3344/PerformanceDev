@@ -306,7 +306,9 @@ public class BabySharkCollector {
 //            return null;
 //        });
 
-        removeLogging();
+        SubsystemBase handler = SubsystemHandlerFactory.getHandler(subsystem);
+        handler.clearLogging(connectionName);
+
         cleanup();
 
         // resets values

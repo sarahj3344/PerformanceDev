@@ -54,6 +54,6 @@ public abstract class SubsystemBase {
 
     public abstract void setLogging(String connectionName);
 
-    public abstract void clearLogging();
+    public abstract void clearLogging(String connectionName);
 
 }

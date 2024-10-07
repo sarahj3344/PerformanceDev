@@ -78,15 +78,15 @@ public class ModbusHandler extends SubsystemBase {
 
     @Override
     public void setLogging(String connectionName) {
-        log.info("Changing logging level for Modbus MDC Key");
+        log.info("Changing logging level for " + connectionName + "MDC Key");
         if(subsystem.contains("Driver")){
             context.getLoggingManager().setPropertyLevel("device-name", connectionName, Level.TRACE);
         }
     }
 
     @Override
-    public void clearLogging() {
-        log.info("Clearing MDC Keys");
-        context.getLoggingManager().clearPropertyLevels();
+    public void clearLogging(String connectionName) {
+        log.info("Clearing MDC Key for " + connectionName);
+        context.getLoggingManager().clearPropertyLevel("device-name", connectionName);
     }
 }
