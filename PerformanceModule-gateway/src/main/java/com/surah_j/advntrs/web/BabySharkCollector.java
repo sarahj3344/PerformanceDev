@@ -47,6 +47,7 @@ public class BabySharkCollector {
     private PcapDumper dump;
     private Thread captureThread;
     private PcapHandle handle;
+    private JSONObject settings;
     private final AtomicBoolean capturing = new AtomicBoolean(false);
     private final LoggerEx log = LogUtil.getLogger(getClass().getSimpleName());
     private final Map<String, String> recordsMap = new HashMap<>();
@@ -131,13 +132,12 @@ public class BabySharkCollector {
     public JSONObject persistentRecs(RequestContext reqContext) throws JSONException {
         this.reqContext = reqContext;
         log.trace("In Persistent Records method");
-        JSONObject json = new JSONObject();
         PersistenceSession session = reqContext.getGatewayContext().getPersistenceInterface().getSession();
 
         log.trace("Starting query for records");
         SubsystemBase handler = SubsystemHandlerFactory.getHandler(subsystem);
-        json = handler.configureSettings(session);
-        return json;
+        settings = handler.configureSettings(session);
+        return settings;
     }
 
     // creates the handle for packet capture with the snapshot length and timeout
@@ -163,31 +163,39 @@ public class BabySharkCollector {
     }
 
     // if a filter passed from UI, sets filter on handle
-    public void setFilter() throws NotOpenException, PcapNativeException {
-        filter = "";
-        if (!ip.isEmpty()) {
-            filter = "host " + ip + " ";
-            if (!port.isEmpty() || !protocolFilter.isEmpty()) {
-                filter = filter + "and ";
-            }
-        }
-
-        if (!port.isEmpty()){
-            filter = filter + "port " + port + " ";
-            if(!protocolFilter.isEmpty()){
-                filter = filter + "and ";
-            }
-        }
-
-        if(!protocolFilter.isEmpty()){
-            filter = filter + protocolFilter;
-        }
+    public void setFilter() throws NotOpenException, PcapNativeException, JSONException {
+//        filter = "";
+//        if (!ip.isEmpty()) {
+//            filter = "host " + ip + " ";
+//            if (!port.isEmpty() || !protocolFilter.isEmpty()) {
+//                filter = filter + "and ";
+//            }
+//        }
+//
+//        if (!port.isEmpty()){
+//            filter = filter + "port " + port + " ";
+//            if(!protocolFilter.isEmpty()){
+//                filter = filter + "and ";
+//            }
+//        }
+//
+//        if(!protocolFilter.isEmpty()){
+//            filter = filter + protocolFilter;
+//        }
 
 //        log.info("FILTER: " + filter);
 
-        if (!filter.isEmpty()) {
-            handle.setFilter(filter, BpfProgram.BpfCompileMode.OPTIMIZE);
+        filter = settings.getString("Filter");
+        log.info(filter);
+
+        try{
+            if (!filter.isEmpty()) {
+                handle.setFilter(filter, BpfProgram.BpfCompileMode.OPTIMIZE);
+            }
+        } catch (Exception e) {
+            log.info("Failed to set filter");
         }
+
     }
 
     // turns up logging on MDC key for device

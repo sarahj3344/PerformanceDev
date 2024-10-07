@@ -34,11 +34,11 @@ public abstract class AbstractScriptModule implements Performance {
 
     @Override
     @ScriptFunction(docBundlePrefix = "AbstractScriptModule")
-    public void startPacketCapture(@ScriptArg("nif") String nif, @ScriptArg("filter") String filter, @ScriptArg("path") String path) throws PcapNativeException, IOException, NotOpenException {
+    public void startPacketCapture(@ScriptArg("nif") String nif, @ScriptArg("filter") String filter, @ScriptArg("path") String path) throws PcapNativeException, IOException, NotOpenException, JSONException {
         startPacketCaptureImpl(nif, filter, path);
     }
 
-    protected abstract void startPacketCaptureImpl(String nif, String filter, String path) throws PcapNativeException, IOException, NotOpenException;
+    protected abstract void startPacketCaptureImpl(String nif, String filter, String path) throws PcapNativeException, IOException, NotOpenException, JSONException;
 
     @Override
     @ScriptFunction(docBundlePrefix = "AbstractScriptModule")

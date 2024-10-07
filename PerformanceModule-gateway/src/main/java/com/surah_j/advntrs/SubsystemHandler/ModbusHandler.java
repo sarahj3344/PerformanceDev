@@ -67,7 +67,7 @@ public class ModbusHandler extends SubsystemBase {
                 results = session.rawQueryMaps(("SELECT HOSTNAME, PORT FROM " + recordsMap.get(subsystem)), true);
                 settingsJson.put("IP", results.get(0).get("HOSTNAME"));
                 settingsJson.put("Port", results.get(0).get("PORT"));
-                settingsJson.put("Filter", "host " + results.get(0).get("HOSTNAME") + " port " + "Port" + results.get(0).get("PORT"));
+                settingsJson.put("Filter", "host " + results.get(0).get("HOSTNAME") + " and port " + results.get(0).get("PORT"));
             }
             json = settingsJson;
         } finally {
@@ -78,7 +78,7 @@ public class ModbusHandler extends SubsystemBase {
 
     @Override
     public void setLogging(String connectionName) {
-        log.info("Changing logging level for " + connectionName + "MDC Key");
+        log.info("Changing logging level for " + connectionName + " MDC Key");
         if(subsystem.contains("Driver")){
             context.getLoggingManager().setPropertyLevel("device-name", connectionName, Level.TRACE);
         }

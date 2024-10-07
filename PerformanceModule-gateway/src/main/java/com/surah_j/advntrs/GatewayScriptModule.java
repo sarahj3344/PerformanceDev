@@ -29,7 +29,7 @@ public class GatewayScriptModule extends AbstractScriptModule {
     }
 
     @Override
-    protected void startPacketCaptureImpl(String nif, String filter, String path) throws PcapNativeException, IOException, NotOpenException {
+    protected void startPacketCaptureImpl(String nif, String filter, String path) throws PcapNativeException, IOException, NotOpenException, JSONException {
         Nemo.setNif(nif);
         if(!filter.isEmpty()){
             Nemo.setFilter();

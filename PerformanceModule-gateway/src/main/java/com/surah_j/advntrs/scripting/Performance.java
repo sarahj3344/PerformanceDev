@@ -12,7 +12,7 @@ import java.io.IOException;
 
 public interface Performance {
     public JSONArray getNIFs() throws IOException, JSONException;
-    public void startPacketCapture(String Nif, String filter, String path) throws PcapNativeException, IOException, NotOpenException;
+    public void startPacketCapture(String Nif, String filter, String path) throws PcapNativeException, IOException, NotOpenException, JSONException;
     public void stopPacketCapture() throws NotOpenException, IOException;
     public void startFlightRecording(String path, String configuration, long age, long duration, long size, boolean dumpOnExit) throws IOException;
 }

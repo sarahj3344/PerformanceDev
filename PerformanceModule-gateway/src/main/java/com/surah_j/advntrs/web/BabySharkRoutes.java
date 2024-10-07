@@ -112,6 +112,7 @@ public class BabySharkRoutes {
                 Nemo.createHandle(device, settingsRec);
                 log.trace("Handle created");
                 Nemo.setFilter();
+                log.trace("Filter set");
                 Nemo.capture();
             }
         } catch (Exception e) {
