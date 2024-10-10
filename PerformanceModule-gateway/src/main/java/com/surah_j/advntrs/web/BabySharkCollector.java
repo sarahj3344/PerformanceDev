@@ -41,13 +41,13 @@ public class BabySharkCollector {
     private String port;
     private String filter;
     private String protocolFilter;
-    private String subsystem;
+    private String subsystem = "";
     private Boolean logging;
     private String connectionName;
     private PcapDumper dump;
     private Thread captureThread;
     private PcapHandle handle;
-    private JSONObject settings;
+    private JSONObject settings = new JSONObject();
     private final AtomicBoolean capturing = new AtomicBoolean(false);
     private final LoggerEx log = LogUtil.getLogger(getClass().getSimpleName());
     private final Map<String, String> recordsMap = new HashMap<>();
@@ -129,23 +129,34 @@ public class BabySharkCollector {
 
     // queries the settings record to get the snapshot length and timeout.
     // Also queries the idb for devices.
-    public JSONObject persistentRecs(RequestContext reqContext) throws JSONException {
+    public void persistentRecs(RequestContext reqContext) throws JSONException {
         this.reqContext = reqContext;
         log.trace("In Persistent Records method");
-        PersistenceSession session = reqContext.getGatewayContext().getPersistenceInterface().getSession();
 
-        log.trace("Starting query for records");
-        SubsystemBase handler = SubsystemHandlerFactory.getHandler(subsystem);
-        settings = handler.configureSettings(session, connectionName);
-        return settings;
+        if(!subsystem.isEmpty()){
+            log.trace("Starting query for records");
+            log.trace("Session retrieved: " + subsystem);
+            SubsystemBase handler = SubsystemHandlerFactory.getHandler(subsystem);
+            log.trace("Handler retrieved " + connectionName);
+            try{
+                settings = handler.configureSettings(connectionName);
+            } catch(Exception e){
+                log.info("Configure failed " + e.getMessage(), e);
+            }
+
+        } else {
+            log.trace("In else block");
+            settings.put("Snapshot Length", 65535);
+            settings.put("Read Timeout", 1000);
+        }
+
+        log.info("SETTINGS" + settings.toString());
     }
 
     // creates the handle for packet capture with the snapshot length and timeout
-    public void createHandle(PcapNetworkInterface device, JSONObject persistentRecs) throws JSONException, PcapNativeException {
-        int SnapshotLength = persistentRecs.getInt("Snapshot Length");
-        int timeout = persistentRecs.getInt("Read Timeout");
+    public void createHandle(PcapNetworkInterface device) throws PcapNativeException {
         device = setNif(dev);
-        handle = device.openLive(SnapshotLength, PcapNetworkInterface.PromiscuousMode.PROMISCUOUS, timeout);
+        handle = device.openLive(65335, PcapNetworkInterface.PromiscuousMode.PROMISCUOUS, 1000);
     }
 
     // If device selected, queries the internal database for device information
@@ -164,29 +175,26 @@ public class BabySharkCollector {
 
     // if a filter passed from UI, sets filter on handle
     public void setFilter() throws NotOpenException, PcapNativeException, JSONException {
-//        filter = "";
-//        if (!ip.isEmpty()) {
-//            filter = "host " + ip + " ";
-//            if (!port.isEmpty() || !protocolFilter.isEmpty()) {
-//                filter = filter + "and ";
-//            }
-//        }
-//
-//        if (!port.isEmpty()){
-//            filter = filter + "port " + port + " ";
-//            if(!protocolFilter.isEmpty()){
-//                filter = filter + "and ";
-//            }
-//        }
-//
-//        if(!protocolFilter.isEmpty()){
-//            filter = filter + protocolFilter;
-//        }
+        filter = "";
 
-//        log.info("FILTER: " + filter);
+        if(settings.has("Filter")){
+            filter = settings.getString("Filter");
+            log.trace(filter);
+        } else {
+            if (!ip.isEmpty()) {
+                filter = "host " + ip + " ";
+                if (!port.isEmpty() || !protocolFilter.isEmpty()) {
+                    filter = filter + "and ";
+                }
+            }
 
-        filter = settings.getString("Filter");
-        log.info(filter);
+            if (!port.isEmpty()){
+                filter = filter + "port " + port + " ";
+                if(!protocolFilter.isEmpty()){
+                    filter = filter + "and ";
+                }
+            }
+        }
 
         try{
             if (!filter.isEmpty()) {
@@ -325,6 +333,7 @@ public class BabySharkCollector {
         subsystem = null;
         connectionName = "";
         dev = null;
+        settings = null;
         logging = false;
         filter = "";
 

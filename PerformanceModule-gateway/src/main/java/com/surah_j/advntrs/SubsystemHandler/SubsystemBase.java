@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 
 public abstract class SubsystemBase {
     protected String subsystem;
+    private String connectionName;
     private final LoggerEx log = LogUtil.getLogger(getClass().getSimpleName());
 
     public SubsystemBase(String subsystem) {
@@ -51,7 +52,7 @@ public abstract class SubsystemBase {
 
     public abstract List<Map> getConnectionNames(PersistenceSession session);
 
-    public abstract JSONObject configureSettings(PersistenceSession session, String connectionName) throws JSONException;
+    public abstract JSONObject configureSettings(String connectionName) throws JSONException;
 
     public abstract void setLogging(String connectionName);
 

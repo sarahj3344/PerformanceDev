@@ -12,6 +12,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import simpleorm.dataset.SQuery;
 
+import java.net.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,8 +31,9 @@ public class OPCUAHandler extends SubsystemBase{
         List<Map> results = new ArrayList<>();
         log.trace("Made it into Get Connection Details");
         try {
-            if(subsystem.contains("Modbus")){
-                results = session.rawQueryMaps(("SELECT NAME FROM " + recordsMap.get(subsystem) + " JOIN OPCSERVERS ON SERVERSETTINGSID = OPCSERVERS_ID"), true);
+            if(subsystem.contains("OPCUA")){
+                results = session.rawQueryMaps(("SELECT NAME FROM " + recordsMap.get(subsystem) +
+                                                " JOIN OPCSERVERS ON SERVERSETTINGSID = OPCSERVERS_ID"), true);
             }
         } finally {
             session.close();
@@ -41,48 +44,51 @@ public class OPCUAHandler extends SubsystemBase{
     }
 
     @Override
-    public JSONObject configureSettings(PersistenceSession session, String connectionName) throws JSONException {
+    public JSONObject configureSettings(String connectionName) throws JSONException {
+        log.trace("In configureSettings");
+        PersistenceSession session = GatewayHook.context.getPersistenceInterface().getSession();
         List<Map> results;
-        JSONObject json = new JSONObject();
+        JSONObject settingsJson = new JSONObject();
 
-        log.trace("Starting query for records");
+        log.trace("Configuring settings");
         try {
-            SQuery<PerformanceSettingsRecord> query = new SQuery<>(PerformanceSettingsRecord.META);
-            List<PerformanceSettingsRecord> settings = session.query(query);
-            JSONArray jsonArray = new JSONArray();
-            json.put("settings", jsonArray);
-            JSONObject settingsJson = new JSONObject();
-            for (PerformanceSettingsRecord record : settings) {
-                if (record != null) {
-                    jsonArray.put(settingsJson);
-                    settingsJson.put("Snapshot Length", record.getSnapshotLength());
-                    settingsJson.put("Read Timeout", record.getReadTimeout());
-                }
-            }
 
             log.trace("Starting query for device connection");
             if (subsystem != null && !subsystem.isEmpty()) {
-                results = session.rawQueryMaps(("SELECT ENDPOINTURL FROM " + recordsMap.get(subsystem)), true);
-                settingsJson.put("IP", results.get(0).get("HOSTNAME"));
-                settingsJson.put("Port", results.get(0).get("PORT"));
-                settingsJson.put("Filter", "host " + results.get(0).get("HOSTNAME") + " and port " + results.get(0).get("PORT"));
+                results = session.rawQueryMaps(("SELECT ENDPOINTURL FROM " + recordsMap.get(subsystem) +
+                                                " JOIN OPCSERVERS ON SERVERSETTINGSID = OPCSERVERS_ID" +
+                                                " WHERE NAME = '" + connectionName + "'"), true);
+                String endpoint = results.get(0).get("ENDPOINTURL").toString();
+                log.trace(endpoint);
+                URI url = new URI(endpoint);
+                settingsJson.put("IP", url.getHost());
+                String host = url.getHost();
+                try{
+                    InetAddress validIP = InetAddress.getByName(host);
+                    settingsJson.put("Port", url.getPort());
+                    settingsJson.put("Filter", "host " + url.getHost() + " and port " + url.getPort());
+                } catch (Exception e) {
+                    log.info("Unable to get host address, manually enter IP address and port if filter required");
+                }
             }
-            json = settingsJson;
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
         } finally {
             session.close();
         }
-        return json;
+        return settingsJson;
     }
 
     @Override
     public void setLogging(String connectionName) {
         log.info("Changing logging level for " + connectionName + " MDC Key");
-        context.getLoggingManager().setPropertyLevel("device-name", connectionName, Level.TRACE);
+        log.info("WARNING: Cannot read encrypted packets, disable security on OPCUA Connection");
+        context.getLoggingManager().setPropertyLevel("connection-name", connectionName, Level.TRACE);
     }
 
     @Override
     public void clearLogging(String connectionName) {
         log.info("Clearing MDC Key for " + connectionName);
-        context.getLoggingManager().clearPropertyLevel("device-name", connectionName);
+        context.getLoggingManager().clearPropertyLevel("connection-name", connectionName);
     }
 }

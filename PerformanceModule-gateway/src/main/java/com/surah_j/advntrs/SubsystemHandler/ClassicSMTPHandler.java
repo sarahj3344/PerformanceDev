@@ -41,44 +41,33 @@ public class ClassicSMTPHandler extends SubsystemBase {
     }
 
     @Override
-    public JSONObject configureSettings(PersistenceSession session, String connectionName) throws JSONException {
+    public JSONObject configureSettings(String connectionName) throws JSONException {
         List<Map> results;
-        JSONObject json = new JSONObject();
+        PersistenceSession session = GatewayHook.context.getPersistenceInterface().getSession();
+        JSONObject settingsJson = new JSONObject();
 
-        log.trace("Starting query for records");
         try {
-            SQuery<PerformanceSettingsRecord> query = new SQuery<>(PerformanceSettingsRecord.META);
-            List<PerformanceSettingsRecord> settings = session.query(query);
-            JSONArray jsonArray = new JSONArray();
-            json.put("settings", jsonArray);
-            JSONObject settingsJson = new JSONObject();
-            for (PerformanceSettingsRecord record : settings) {
-                if (record != null) {
-                    jsonArray.put(settingsJson);
-                    settingsJson.put("Snapshot Length", record.getSnapshotLength());
-                    settingsJson.put("Read Timeout", record.getReadTimeout());
-                }
-            }
 
             log.trace("Starting query for device connection");
             if (subsystem != null && !subsystem.isEmpty()) {
-                results = session.rawQueryMaps(("SELECT NAME, HOSTNAME, PORT FROM " + recordsMap.get(subsystem) +
-                        "JOIN DEVICESETTINGS ON DEVICESETTINGSID = DEVICESETTINGS_ID" +
-                        "WHERE NAME = '" + connectionName + "'"), true);
+                String queryString = "SELECT NAME, HOSTNAME, PORT FROM " + recordsMap.get(subsystem) +
+                        " JOIN DEVICESETTINGS ON DEVICESETTINGSID = DEVICESETTINGS_ID" +
+                        " WHERE NAME = '" + connectionName + "'";
+                log.info(queryString);
+                results = session.rawQueryMaps((queryString), true);
                 settingsJson.put("IP", results.get(0).get("HOSTNAME"));
                 settingsJson.put("Port", results.get(0).get("PORT"));
                 settingsJson.put("Filter", "host " + results.get(0).get("HOSTNAME") + " and port " + results.get(0).get("PORT"));
             }
-            json = settingsJson;
         } finally {
             session.close();
         }
-        return json;
+        return settingsJson;
     }
 
     @Override
     public void setLogging(String connectionName) {
-        log.info("Changing logging level for " + connectionName + " MDC Key");
+        log.info("Changing logging level for " + connectionName + "'s MDC Key");
             context.getLoggingManager().setPropertyLevel("name", connectionName, Level.TRACE);
     }
 

@@ -28,7 +28,13 @@ function BabySharkForm() {
   const [running, setRunning] = useState(false);
   const [hasFetched, setHasFetched] = useState<boolean>(false);
 
-  let subsystems = ["Modbus TCP Driver", "Logix Driver", "DNP3 Driver", "SMTP"];
+  let subsystems = [
+    "Modbus TCP Driver",
+    "Logix Driver",
+    "DNP3 Driver",
+    "Classic SMTP",
+    "OPCUA Connections",
+  ];
 
   // useEffect(() => {}, []);
 

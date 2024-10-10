@@ -132,7 +132,7 @@ function BabySharkForm() {
     _useState22 = _slicedToArray(_useState21, 2),
     hasFetched = _useState22[0],
     setHasFetched = _useState22[1];
-  var subsystems = ["Modbus TCP Driver", "Logix Driver", "DNP3 Driver", "SMTP"];
+  var subsystems = ["Modbus TCP Driver", "Logix Driver", "DNP3 Driver", "Classic SMTP", "OPCUA Connections"];
 
   // useEffect(() => {}, []);
 
