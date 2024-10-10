@@ -29,11 +29,18 @@ function BabySharkForm() {
   const [hasFetched, setHasFetched] = useState<boolean>(false);
 
   let subsystems = [
+    "Classic SMTP",
+    "OPCUA Connections",
     "Modbus TCP Driver",
     "Logix Driver",
     "DNP3 Driver",
-    "Classic SMTP",
-    "OPCUA Connections",
+    "Siemens Driver",
+    "Omron Fins/TCP Driver",
+    "Mitsubishi Driver",
+    "IEC61850 Driver",
+    "BACnet Driver",
+    "MQTT Transmission",
+    "MQTT Engine",
   ];
 
   // useEffect(() => {}, []);

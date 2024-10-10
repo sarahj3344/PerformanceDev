@@ -6,11 +6,8 @@ import com.inductiveautomation.ignition.common.util.LoggerEx;
 import com.inductiveautomation.ignition.gateway.localdb.persistence.PersistenceSession;
 import com.inductiveautomation.ignition.gateway.model.GatewayContext;
 import com.surah_j.advntrs.GatewayHook;
-import com.surah_j.advntrs.records.PerformanceSettingsRecord;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import simpleorm.dataset.SQuery;
 
 import java.net.*;
 
@@ -31,10 +28,8 @@ public class OPCUAHandler extends SubsystemBase{
         List<Map> results = new ArrayList<>();
         log.trace("Made it into Get Connection Details");
         try {
-            if(subsystem.contains("OPCUA")){
                 results = session.rawQueryMaps(("SELECT NAME FROM " + recordsMap.get(subsystem) +
                                                 " JOIN OPCSERVERS ON SERVERSETTINGSID = OPCSERVERS_ID"), true);
-            }
         } finally {
             session.close();
         }
@@ -52,7 +47,6 @@ public class OPCUAHandler extends SubsystemBase{
 
         log.trace("Configuring settings");
         try {
-
             log.trace("Starting query for device connection");
             if (subsystem != null && !subsystem.isEmpty()) {
                 results = session.rawQueryMaps(("SELECT ENDPOINTURL FROM " + recordsMap.get(subsystem) +

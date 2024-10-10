@@ -4,7 +4,7 @@ import "./shark.css";
 import FlightRecordingForm from "./FlightRecordingForm";
 
 function TabContainer() {
-  let tabs = ["Baby Shark", "Flight Recorder"];
+  let tabs = ["Baby Shark", "Flight Recorder", "Terminal Simulator"];
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   useEffect(

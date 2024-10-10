@@ -15,6 +15,18 @@ public class SubsystemHandlerFactory {
                 return new LogixHandler(subsystem);
             case "OPCUA Connections":
                 return new OPCUAHandler(subsystem);
+            case "Omron Fins/TCP Driver":
+                return new OmronFinsTCPHandler(subsystem);
+            case "Mitsubishi Driver":
+                return new MitsubishiHandler(subsystem);
+            case "IEC61850 Driver":
+                return new IEC61850Handler(subsystem);
+            case "BACnet Driver":
+                return new BACnetHandler(subsystem);
+            case "MQTT Engine":
+                return new MQTTEngineHandler(subsystem);
+            case "MQTT Transmission":
+                return new MQTTTransmissionHandler(subsystem);
             default:
                 throw new IllegalArgumentException("Unsupported subsystem: " + subsystem);
         }

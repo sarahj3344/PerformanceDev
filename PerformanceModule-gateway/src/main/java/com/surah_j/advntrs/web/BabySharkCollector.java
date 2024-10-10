@@ -54,13 +54,13 @@ public class BabySharkCollector {
     private RequestContext reqContext;
 
     // map used to determine the correct config.idb table to query
-    public void setRecordsMap() {
-        recordsMap.put("Modbus TCP Driver", "MODBUSTCPDRIVERSETTINGS");
-        recordsMap.put("Logix Driver", "LOGIXDRIVERSETTINGS");
-        recordsMap.put("DNP3 Driver", "DNP3DRIVERSETTINGS");
-        recordsMap.put("SMTP", "CLASSICSMTPEMAILPROFILES");
-        recordsMap.put("Database", "DATASOURCES");
-    }
+//    public void setRecordsMap() {
+//        recordsMap.put("Modbus TCP Driver", "MODBUSTCPDRIVERSETTINGS");
+//        recordsMap.put("Logix Driver", "LOGIXDRIVERSETTINGS");
+//        recordsMap.put("DNP3 Driver", "DNP3DRIVERSETTINGS");
+//        recordsMap.put("SMTP", "CLASSICSMTPEMAILPROFILES");
+//        recordsMap.put("Database", "DATASOURCES");
+//    }
 
     // retrieves the network interfaces on the Ignition server and send sends the name / description
     public JSONArray getNIFs() throws IOException, JSONException {

@@ -6,11 +6,8 @@ import com.inductiveautomation.ignition.common.util.LoggerEx;
 import com.inductiveautomation.ignition.gateway.localdb.persistence.PersistenceSession;
 import com.inductiveautomation.ignition.gateway.model.GatewayContext;
 import com.surah_j.advntrs.GatewayHook;
-import com.surah_j.advntrs.records.PerformanceSettingsRecord;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import simpleorm.dataset.SQuery;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,9 +26,7 @@ public class DNP3Handler extends SubsystemBase {
         List<Map> results = new ArrayList<>();
         log.trace("Made it into Get Connection Details");
         try {
-            if(subsystem.contains("Modbus")){
-                results = session.rawQueryMaps(("SELECT NAME FROM " + recordsMap.get(subsystem) + " JOIN DEVICESETTINGS ON DEVICESETTINGSID = DEVICESETTINGS_ID"), true);
-            }
+            results = session.rawQueryMaps(("SELECT NAME FROM " + recordsMap.get(subsystem) + " JOIN DEVICESETTINGS ON DEVICESETTINGSID = DEVICESETTINGS_ID"), true);
         } finally {
             session.close();
         }

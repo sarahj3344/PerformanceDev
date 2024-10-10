@@ -6,11 +6,9 @@ import com.inductiveautomation.ignition.common.util.LoggerEx;
 import com.inductiveautomation.ignition.gateway.localdb.persistence.PersistenceSession;
 import com.inductiveautomation.ignition.gateway.model.GatewayContext;
 import com.surah_j.advntrs.GatewayHook;
-import com.surah_j.advntrs.records.PerformanceSettingsRecord;
-import org.json.JSONArray;
+
 import org.json.JSONException;
 import org.json.JSONObject;
-import simpleorm.dataset.SQuery;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,9 +27,7 @@ public class ClassicSMTPHandler extends SubsystemBase {
         List<Map> results = new ArrayList<>();
         log.trace("Made it into Get Connection Details");
         try {
-            if(subsystem.contains("Classic SMTP")){
-                results = session.rawQueryMaps(("SELECT NAME FROM " + recordsMap.get(subsystem) + " JOIN DEVICESETTINGS ON DEVICESETTINGSID = DEVICESETTINGS_ID"), true);
-            }
+            results = session.rawQueryMaps(("SELECT NAME FROM EMAILPROFILES WHERE TYPE = 'smtp.classic'"), true);
         } finally {
             session.close();
         }
@@ -50,9 +46,9 @@ public class ClassicSMTPHandler extends SubsystemBase {
 
             log.trace("Starting query for device connection");
             if (subsystem != null && !subsystem.isEmpty()) {
-                String queryString = "SELECT NAME, HOSTNAME, PORT FROM " + recordsMap.get(subsystem) +
-                        " JOIN DEVICESETTINGS ON DEVICESETTINGSID = DEVICESETTINGS_ID" +
-                        " WHERE NAME = '" + connectionName + "'";
+                String queryString = "SELECT NAME, HOSTNAME, PORT FROM EMAILPROFILES " +
+                                     "JOIN " + recordsMap.get(subsystem) + " ON PROFILEID = EMAILPROFILES_ID " +
+                                     "WHERE NAME = '" + connectionName + "'";
                 log.info(queryString);
                 results = session.rawQueryMaps((queryString), true);
                 settingsJson.put("IP", results.get(0).get("HOSTNAME"));

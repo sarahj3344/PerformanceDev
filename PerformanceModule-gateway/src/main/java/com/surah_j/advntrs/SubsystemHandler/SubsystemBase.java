@@ -2,6 +2,7 @@ package com.surah_j.advntrs.SubsystemHandler;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import com.inductiveautomation.ignition.common.logging.Level;
 import com.inductiveautomation.ignition.common.util.LogUtil;
 import com.inductiveautomation.ignition.common.util.LoggerEx;
@@ -34,6 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 
 public abstract class SubsystemBase {
     protected String subsystem;
+    public static final Map<String, String> recordsMap;
     private String connectionName;
     private final LoggerEx log = LogUtil.getLogger(getClass().getSimpleName());
 
@@ -41,14 +43,22 @@ public abstract class SubsystemBase {
         this.subsystem = subsystem;
     }
 
-    public final Map<String, String> recordsMap = Map.of(
-            "Modbus TCP Driver", "MODBUSTCPDRIVERSETTINGS",
-            "Logix Driver", "LOGIXDRIVERSETTINGS",
-            "DNP3 Driver", "DNP3DEVICESETTINGS",
-            "Classic SMTP", "CLASSICSMTPEMAILPROFILES",
-            "Database", "DATASOURCES",
-            "OPCUA Connections", "OPCUACONNECTIONSETTINGS"
-    );
+    static {
+        recordsMap = new HashMap<>();
+        recordsMap.put("Modbus TCP Driver", "MODBUSTCPDRIVERSETTINGS");
+        recordsMap.put("Logix Driver", "LOGIXDRIVERSETTINGS");
+        recordsMap.put("DNP3 Driver", "DNP3DEVICESETTINGS");
+        recordsMap.put("Classic SMTP", "CLASSICSMTPEMAILPROFILES");
+        recordsMap.put("OPCUA Connections", "OPCUACONNECTIONSETTINGS");
+        recordsMap.put("Omron Fins/TCP Driver", "FINSTCPDEVICESETTINGS");
+        recordsMap.put("Mitsubishi Driver", "MITSUBISHITCPDEVICESETTINGS");
+        recordsMap.put("IEC61850 Driver", "IEC61850DEVICESETTINGS");
+        recordsMap.put("BACnet Driver", "BACNETIPLOCALDEVICESETTINGS");
+        recordsMap.put("MQTT Engine", "ENGINESERVERRECORD");
+        recordsMap.put("MQTT Transmission", "TRANSMISSIONSERVERRECORD");
+        recordsMap.put("Siemens Driver", "Check Handler");
+    }
+
 
     public abstract List<Map> getConnectionNames(PersistenceSession session);
 
