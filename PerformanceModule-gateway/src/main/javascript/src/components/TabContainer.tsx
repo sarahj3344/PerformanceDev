@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import BabySharkForm from "./BabySharkForm";
 import "./shark.css";
 import FlightRecordingForm from "./FlightRecordingForm";
+import TerminalSim from "./TerminalSim";
 
 function TabContainer() {
   let tabs = ["Baby Shark", "Flight Recorder", "Terminal Simulator"];
@@ -64,6 +65,7 @@ function TabContainer() {
       <div className="container">
         {selectedIndex === 0 && <BabySharkForm />}
         {selectedIndex === 1 && <FlightRecordingForm />}
+        {selectedIndex === 2 && <TerminalSim />}
       </div>
     </>
   );
