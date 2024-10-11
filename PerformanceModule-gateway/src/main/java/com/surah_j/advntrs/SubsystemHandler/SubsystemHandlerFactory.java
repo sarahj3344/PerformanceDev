@@ -23,10 +23,22 @@ public class SubsystemHandlerFactory {
                 return new IEC61850Handler(subsystem);
             case "BACnet Driver":
                 return new BACnetHandler(subsystem);
+            case "Siemens Drivers":
+                return new SiemensHandler(subsystem);
             case "MQTT Engine":
                 return new MQTTEngineHandler(subsystem);
             case "MQTT Transmission":
                 return new MQTTTransmissionHandler(subsystem);
+            case "Voice Notification Profile":
+                return new VoiceNotificationHandler(subsystem);
+            case "SMS Notification Profile":
+                return new SMSNotificationHandler(subsystem);
+            case "SECS/GEM":
+                return new SECSGEMHandler(subsystem);
+            case "TCP Driver":
+                return new TCPDriverHandler(subsystem);
+            case "UDP Driver":
+                return new UDPDriverHandler(subsystem);
             default:
                 throw new IllegalArgumentException("Unsupported subsystem: " + subsystem);
         }

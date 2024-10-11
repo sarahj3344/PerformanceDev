@@ -33,7 +33,12 @@ public abstract class SubsystemBase {
         recordsMap.put("BACnet Driver", "BACNETIPLOCALDEVICESETTINGS");
         recordsMap.put("MQTT Engine", "ENGINESERVERRECORD");
         recordsMap.put("MQTT Transmission", "TRANSMISSIONSERVERRECORD");
-        recordsMap.put("Siemens Driver", "Check Handler");
+        recordsMap.put("Siemens Drivers", "Check Handler");
+        recordsMap.put("Voice Notification Profile", "SIPNOTIFICATIONSETTINGS");
+        recordsMap.put("SMS Notification Profile", "SMSNOTIFICATIONPROFILESETTINGS");
+        recordsMap.put("SECS/GEM", "EQUIPMENTRECORD");
+        recordsMap.put("TCP Driver", "TCPDRIVERSETTINGS");
+        recordsMap.put("UDP Driver", "UDPDRIVERSETTINGS");
     }
 
 

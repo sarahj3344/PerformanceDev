@@ -6,6 +6,7 @@ com\surah_j\advntrs\SubsystemHandler\IEC61850Handler.class
 com\surah_j\advntrs\GatewayHook$2.class
 com\surah_j\advntrs\web\BabySharkRoutes.class
 com\surah_j\advntrs\PerformanceConnectionSettings.class
+com\surah_j\advntrs\SubsystemHandler\SMSNotificationHandler.class
 com\surah_j\advntrs\records\PerformanceSettingsRecord.class
 com\surah_j\advntrs\DiagnosticsManagerImpl$PcapFileContributor.class
 com\surah_j\advntrs\DiagnosticsManagerImpl$JfrFileContributor.class
@@ -13,7 +14,9 @@ com\surah_j\advntrs\web\PerformanceSettingsPage.class
 com\surah_j\advntrs\SubsystemHandler\DNP3Handler.class
 com\surah_j\advntrs\SubsystemHandler\BACnetHandler.class
 com\surah_j\advntrs\SubsystemHandler\MitsubishiHandler.class
+com\surah_j\advntrs\SubsystemHandler\TCPDriverHandler.class
 com\surah_j\advntrs\records\FlightRecordingSettingsRecord.class
+com\surah_j\advntrs\SubsystemHandler\UDPDriverHandler.class
 com\surah_j\advntrs\web\FlightRecordingRoutes.class
 com\surah_j\advntrs\GatewayHook$1.class
 com\surah_j\advntrs\SubsystemHandler\OmronFinsTCPHandler.class
@@ -27,5 +30,7 @@ com\surah_j\advntrs\SubsystemHandler\MQTTEngineHandler.class
 com\surah_j\advntrs\SubsystemHandler\SubsystemHandlerFactory.class
 com\surah_j\advntrs\SubsystemHandler\SiemensHandler.class
 com\surah_j\advntrs\SubsystemHandler\ModbusHandler.class
+com\surah_j\advntrs\SubsystemHandler\SECSGEMHandler.class
 com\surah_j\advntrs\SubsystemHandler\MQTTTransmissionHandler.class
 com\surah_j\advntrs\SubsystemHandler\ClassicSMTPHandler.class
+com\surah_j\advntrs\SubsystemHandler\VoiceNotificationHandler.class

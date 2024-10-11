@@ -60,7 +60,7 @@ public class OPCUAHandler extends SubsystemBase{
                 try{
                     InetAddress validIP = InetAddress.getByName(host);
                     settingsJson.put("Port", url.getPort());
-                    settingsJson.put("Filter", "host " + url.getHost() + " and port " + url.getPort());
+                    settingsJson.put("Filter", "host " + validIP + " and port " + url.getPort());
                 } catch (Exception e) {
                     log.info("Unable to get host address, manually enter IP address and port if filter required");
                 }
