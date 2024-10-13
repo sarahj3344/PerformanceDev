@@ -267,8 +267,8 @@
 /* Terminal Container */
 .terminal-container {
   margin-top: 5%;
-  width: 60%;
-  height: 50vh;
+  width: 70%;
+  height: 60vh;
   background-color: #0c0c0c; /* Dark background similar to Windows Terminal */
   color: #ffffff; /* Default text color */
   padding: 10px;
@@ -308,6 +308,7 @@
   flex: 1;
   background-color: #0c0c0c; /* Match the dark terminal background */
   color: #34c759;
+  white-space: pre-wrap;
   overflow-y: auto;
   padding: 10px;
   font-size: 14px;

@@ -199,6 +199,7 @@ public class GatewayHook extends AbstractGatewayModuleHook {
     public void mountRouteHandlers(RouteGroup routes) {
         new BabySharkRoutes(context, routes).mountRoutes();
         new FlightRecordingRoutes(context, routes).mountRoutes();
+        new TerminalSimRoutes(context, routes).mountRoutes();
     }
 
 

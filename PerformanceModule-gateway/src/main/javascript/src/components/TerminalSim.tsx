@@ -2,38 +2,37 @@ import { useState, useEffect } from "react";
 
 interface Terminal {
   operatingSystem: string;
-  response: string;
+  result: string;
 }
 
 function TerminalSim() {
-  useEffect(() => {
-    // the code we want to run
-    const fetchCommand = async () => {
-      {
-        const params = {
-          command: terminalCommand,
-        };
-        try {
-          const response = await fetch("/data/performance/terminalSim", {
-            method: "POST",
-            headers: {
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(params),
-          });
-          const text = await response.json();
-          const terminalResponse = text as Terminal[];
-          setTerminalOutput(
-            (prevOutput) =>
-              `${prevOutput}\n${terminalResponse}\n${header}${terminalCommand}`
-          );
-        } catch (error) {
-          console.error("Error fetching terminal details:", error);
-        }
+  // the code we want to run
+  const fetchCommand = async () => {
+    {
+      const params = {
+        command: terminalCommand,
+      };
+      try {
+        const response = await fetch("/data/performance/terminalSim", {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(params),
+        });
+        const text = await response.json();
+        console.log(text);
+        const terminalResponse = text as Terminal;
+        setTerminalOutput(
+          (prevOutput) => `${prevOutput}\n${terminalResponse.result}`
+        );
+        console.log(terminalOutput);
+      } catch (error) {
+        console.error("Error fetching terminal details:", error);
       }
-    };
-  });
+    }
+  };
 
   const [terminalOutput, setTerminalOutput] = useState<string>("");
   const [terminalCommand, setTerminalCommand] = useState<string>("");
@@ -57,6 +56,7 @@ function TerminalSim() {
       setTerminalOutput(
         (prevOutput) => `${prevOutput}\n${header}${terminalCommand}`
       );
+      fetchCommand();
       setTerminalCommand("");
     }
   };
