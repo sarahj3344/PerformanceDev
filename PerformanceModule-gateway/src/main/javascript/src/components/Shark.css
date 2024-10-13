@@ -266,7 +266,7 @@
 
 /* Terminal Container */
 .terminal-container {
-  margin-top: 5px;
+  margin-top: 5%;
   width: 60%;
   height: 50vh;
   background-color: #0c0c0c; /* Dark background similar to Windows Terminal */
