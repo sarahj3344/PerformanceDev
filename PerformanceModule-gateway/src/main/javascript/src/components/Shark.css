@@ -319,6 +319,7 @@
 /* Command Line */
 .terminal-input {
   color: #34c759; /* Bright green color for input text */
+  background-color: #0c0c0c;
   outline: none;
   border: none;
   /* background: transparent; */
