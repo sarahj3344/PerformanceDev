@@ -25,11 +25,11 @@ public abstract class AbstractScriptModule implements Performance {
 
     @Override
     @ScriptFunction(docBundlePrefix = "AbstractScriptModule")
-    public JSONArray getNIFs() throws IOException, JSONException {
+    public JSONArray getNIFs() throws IOException, JSONException, PcapNativeException {
         return getNIFsImpl();
     }
 
-    protected abstract JSONArray getNIFsImpl() throws IOException, JSONException;
+    protected abstract JSONArray getNIFsImpl() throws IOException, JSONException, PcapNativeException;
 
 
     @Override

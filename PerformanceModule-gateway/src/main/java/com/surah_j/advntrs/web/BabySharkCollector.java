@@ -10,12 +10,11 @@ import com.surah_j.advntrs.DiagnosticsManagerImpl$PcapFileContributor;
 import com.surah_j.advntrs.GatewayHook;
 import com.surah_j.advntrs.SubsystemHandler.SubsystemBase;
 import com.surah_j.advntrs.SubsystemHandler.SubsystemHandlerFactory;
-import com.surah_j.advntrs.records.PerformanceSettingsRecord;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.pcap4j.core.*;
-import simpleorm.dataset.SQuery;
+import org.pcap4j.packet.Packet;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,7 +26,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
@@ -53,17 +51,9 @@ public class BabySharkCollector {
     private final Map<String, String> recordsMap = new HashMap<>();
     private RequestContext reqContext;
 
-    // map used to determine the correct config.idb table to query
-//    public void setRecordsMap() {
-//        recordsMap.put("Modbus TCP Driver", "MODBUSTCPDRIVERSETTINGS");
-//        recordsMap.put("Logix Driver", "LOGIXDRIVERSETTINGS");
-//        recordsMap.put("DNP3 Driver", "DNP3DRIVERSETTINGS");
-//        recordsMap.put("SMTP", "CLASSICSMTPEMAILPROFILES");
-//        recordsMap.put("Database", "DATASOURCES");
-//    }
 
     // retrieves the network interfaces on the Ignition server and send sends the name / description
-    public JSONArray getNIFs() throws IOException, JSONException {
+    public JSONArray getNIFs() throws IOException, JSONException, PcapNativeException {
         List<PcapNetworkInterface> nif = null;
 
         try {
@@ -77,9 +67,6 @@ public class BabySharkCollector {
         StringBuilder json = new StringBuilder("[");
         for (int i = 0; i < nif.size(); i++) {
             PcapNetworkInterface info = nif.get(i);
-            if (i > 0) {
-                json.append(",");
-            }
 
             // Display the IP address of the NIC
             String addresses = info.getAddresses().toString();
@@ -89,21 +76,25 @@ public class BabySharkCollector {
             int end = addresses.indexOf("]", start);
             if (end != -1){
                 ipAddress = addresses.substring(start, end);
-                log.trace(ipAddress);
             }
-            json.append("{")
-                    .append("\"name\":\"")
-                    .append(info.getName().replace("\\", "\\\\"))
-                    .append("\",")
-                    .append("\"description\":\"").append(info.getDescription().replace("\\", "\\\\"))
-                    .append(", NIC: ")
-                    .append(ipAddress)
-                    .append("\"")
-                    .append("}");
-        }
+
+            if(!ipAddress.equalsIgnoreCase("Unavailable")) {
+                if (i > 0 && json.toString().contains("{")) {
+                    json.append(",");
+                }
+                json.append("{")
+                        .append("\"name\":\"")
+                        .append(info.getName().replace("\\", "\\\\"))
+                        .append("\", \"NIC\":\"")
+                        .append(ipAddress)
+                        .append("\"")
+                        .append("}");
+            }
+            }
+
         json.append("]");
 
-        log.trace(json.toString());
+        log.info(json.toString());
 
         JSONArray nifArray = new JSONArray(json.toString());
         JSONObject nifs = new JSONObject();
@@ -121,6 +112,7 @@ public class BabySharkCollector {
     public void setProperties(JSONObject body) throws JSONException {
         connectionName = body.getString("connection");
         dev = body.getString("device");
+        log.info("DEVICE: " + dev);
         ip = body.getString("ip");
         port = body.getString("port");
         logging = body.getBoolean("logging");
@@ -246,7 +238,7 @@ public class BabySharkCollector {
 
                         // dumps packet
                         @Override
-                        public void gotPacket(PcapPacket packet) {
+                        public void gotPacket(Packet packet) {
                             try {
                                 dump.dump(packet);
                             } catch (NotOpenException e) {
@@ -322,8 +314,10 @@ public class BabySharkCollector {
 //            return null;
 //        });
 
-        SubsystemBase handler = SubsystemHandlerFactory.getHandler(subsystem);
-        handler.clearLogging(connectionName);
+        if(!subsystem.isEmpty()){
+            SubsystemBase handler = SubsystemHandlerFactory.getHandler(subsystem);
+            handler.clearLogging(connectionName);
+        }
 
         cleanup();
 

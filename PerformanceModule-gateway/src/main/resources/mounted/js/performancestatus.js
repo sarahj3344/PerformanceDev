@@ -157,19 +157,20 @@ function BabySharkForm() {
               ifaces = text.nifs;
               state = text.running;
               if (state === true) setRunning(true);
+              console.log(ifaces);
               setNetworkInterfaces(ifaces);
               setHasFetched(true);
-              _context.next = 17;
+              _context.next = 18;
               break;
-            case 14:
-              _context.prev = 14;
+            case 15:
+              _context.prev = 15;
               _context.t0 = _context["catch"](0);
               console.error("Error fetching network interfaces:", _context.t0);
-            case 17:
+            case 18:
             case "end":
               return _context.stop();
           }
-        }, _callee, null, [[0, 14]]);
+        }, _callee, null, [[0, 15]]);
       }));
       return function fetchInterfaces() {
         return _ref.apply(this, arguments);
@@ -325,7 +326,7 @@ function BabySharkForm() {
     return /*#__PURE__*/React.createElement("option", {
       key: index,
       value: iface.name
-    }, iface.description);
+    }, iface.NIC);
   }))), /*#__PURE__*/React.createElement("div", {
     className: "input-group mb-3"
   }, /*#__PURE__*/React.createElement("label", {

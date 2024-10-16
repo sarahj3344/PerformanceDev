@@ -11,7 +11,7 @@ import org.pcap4j.core.PcapNetworkInterface;
 import java.io.IOException;
 
 public interface Performance {
-    public JSONArray getNIFs() throws IOException, JSONException;
+    public JSONArray getNIFs() throws IOException, JSONException, PcapNativeException;
     public void startPacketCapture(String Nif, String filter, String path) throws PcapNativeException, IOException, NotOpenException, JSONException;
     public void stopPacketCapture() throws NotOpenException, IOException;
     public void startFlightRecording(String path, String configuration, long age, long duration, long size, boolean dumpOnExit) throws IOException;

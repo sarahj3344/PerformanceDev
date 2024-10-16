@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 // Define the type for network interfaces
 interface NetworkInterface {
   name: string;
-  description: string;
+  NIC: string;
 }
 
 interface Connections {
@@ -61,7 +61,7 @@ function BabySharkForm() {
           const ifaces = text.nifs as NetworkInterface[];
           const state = text.running as Boolean;
           if (state === true) setRunning(true);
-
+          console.log(ifaces);
           setNetworkInterfaces(ifaces);
           setHasFetched(true);
         } catch (error) {
@@ -197,7 +197,7 @@ function BabySharkForm() {
               <option value="">Select Network Interface</option>
               {networkInterfaces.map((iface, index) => (
                 <option key={index} value={iface.name}>
-                  {iface.description}
+                  {iface.NIC}
                 </option>
               ))}
             </select>

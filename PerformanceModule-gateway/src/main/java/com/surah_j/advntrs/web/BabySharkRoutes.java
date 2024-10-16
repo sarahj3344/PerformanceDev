@@ -67,7 +67,7 @@ public class BabySharkRoutes {
         log.info("Routes mounted");
     }
 
-    public Object initialState(RequestContext request, HttpServletResponse response) throws IOException, JSONException {
+    public Object initialState(RequestContext request, HttpServletResponse response) throws IOException, JSONException, PcapNativeException {
         JSONArray nifs = Nemo.getNIFs();
         JSONObject state = new JSONObject();
         state.put("nifs", nifs);

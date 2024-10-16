@@ -24,7 +24,7 @@ public class GatewayScriptModule extends AbstractScriptModule {
     PcapDumper dump;
     PcapHandle handle;
 
-    public JSONArray getNIFsImpl() throws IOException, JSONException{
+    public JSONArray getNIFsImpl() throws IOException, JSONException, PcapNativeException {
         return Nemo.getNIFs();
     }
 
