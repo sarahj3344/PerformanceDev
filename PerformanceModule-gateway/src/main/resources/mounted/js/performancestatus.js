@@ -263,12 +263,21 @@ function BabySharkForm() {
             });
           case 3:
             response = _context3.sent;
-            _context3.next = 6;
+            if (!response.ok) {
+              _context3.next = 11;
+              break;
+            }
+            _context3.next = 7;
             return response.json();
-          case 6:
+          case 7:
             state = _context3.sent;
-            if (state.running === false) setRunning(false);
-          case 8:
+            setRunning(true);
+            // if (state.running === false) setRunning(false);
+            _context3.next = 12;
+            break;
+          case 11:
+            console.error("Failed to start recording, check logs");
+          case 12:
           case "end":
             return _context3.stop();
         }
@@ -286,6 +295,7 @@ function BabySharkForm() {
     })["catch"](function (error) {
       return console.error(error);
     });
+    setRunning(false);
   };
   var handleInterfaceChange = function handleInterfaceChange(event) {
     setSelectedInterface(event.target.value);
@@ -415,11 +425,9 @@ function BabySharkForm() {
     color: running ? "stop" : "start",
     onClick: function onClick() {
       if (running === false) {
-        setRunning(true);
         console.log("STARTING CAPTURE");
         startCapture();
       } else {
-        setRunning(false);
         console.log("STOPPING CAPTURE");
         stopCapture();
       }

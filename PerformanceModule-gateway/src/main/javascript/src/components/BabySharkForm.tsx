@@ -134,8 +134,13 @@ function BabySharkForm() {
       },
       body: JSON.stringify(params),
     });
-    const state = await response.json();
-    if (state.running === false) setRunning(false);
+    if (response.ok) {
+      const state = await response.json();
+      setRunning(true);
+      // if (state.running === false) setRunning(false);
+    } else {
+      console.error("Failed to start recording, check logs");
+    }
   };
 
   const stopCapture = () => {
@@ -144,6 +149,7 @@ function BabySharkForm() {
     })
       .then((data: any) => console.log(data))
       .catch((error: any) => console.error(error));
+    setRunning(false);
   };
 
   const handleInterfaceChange = (
@@ -301,11 +307,9 @@ function BabySharkForm() {
         color={running ? "stop" : "start"}
         onClick={() => {
           if (running === false) {
-            setRunning(true);
             console.log("STARTING CAPTURE");
             startCapture();
           } else {
-            setRunning(false);
             console.log("STOPPING CAPTURE");
             stopCapture();
           }
