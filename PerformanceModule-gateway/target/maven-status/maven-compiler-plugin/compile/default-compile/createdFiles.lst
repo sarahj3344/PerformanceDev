@@ -5,7 +5,6 @@ com\surah_j\advntrs\web\BabySharkRoutes.class
 com\surah_j\advntrs\PerformanceConnectionSettings.class
 com\surah_j\advntrs\web\PerformanceSettingsPage.class
 com\surah_j\advntrs\SubsystemHandler\MitsubishiHandler.class
-com\surah_j\advntrs\GatewayScriptModule.class
 com\surah_j\advntrs\SubsystemHandler\OPCUAHandler.class
 com\surah_j\advntrs\SubsystemHandler\SubsystemHandlerFactory.class
 com\surah_j\advntrs\SubsystemHandler\SiemensHandler.class
@@ -18,6 +17,7 @@ com\surah_j\advntrs\web\BabySharkCollector$1.class
 com\surah_j\advntrs\web\BabySharkCollector.class
 com\surah_j\advntrs\web\TerminalSimRoutes.class
 com\surah_j\advntrs\oshandler\OSBase.class
+com\surah_j\advntrs\scripting\GatewayScriptModule.class
 com\surah_j\advntrs\oshandler\OSHandlerFactory.class
 com\surah_j\advntrs\SubsystemHandler\SMSNotificationHandler.class
 com\surah_j\advntrs\records\PerformanceSettingsRecord.class

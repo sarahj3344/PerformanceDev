@@ -18,6 +18,8 @@ import org.pcap4j.packet.Packet;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
@@ -108,6 +110,11 @@ public class BabySharkCollector {
         return Pcaps.getDevByName(dev);
     }
 
+    public PcapNetworkInterface setNifbyAddress(String ip) throws PcapNativeException, UnknownHostException {
+        InetAddress ipAddr = InetAddress.getByName(ip);
+        return Pcaps.getDevByAddress(ipAddr);
+    }
+
     // takes the body and sets the k/v to variables
     public void setProperties(JSONObject body) throws JSONException {
         connectionName = body.getString("connection");
@@ -147,7 +154,6 @@ public class BabySharkCollector {
 
     // creates the handle for packet capture with the snapshot length and timeout
     public void createHandle(PcapNetworkInterface device) throws PcapNativeException {
-        device = setNif(dev);
         handle = device.openLive(65335, PcapNetworkInterface.PromiscuousMode.PROMISCUOUS, 1000);
     }
 

@@ -10,6 +10,8 @@ import com.inductiveautomation.ignition.gateway.model.GatewayContext;
 import com.inductiveautomation.ignition.gateway.web.models.*;
 import com.inductiveautomation.ignition.gateway.web.pages.BasicReactPanel;
 import com.inductiveautomation.ignition.gateway.web.pages.status.StatusCategories;
+import com.surah_j.advntrs.scripting.AbstractScriptModule;
+import com.surah_j.advntrs.scripting.GatewayScriptModule;
 import com.surah_j.advntrs.web.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,6 +99,7 @@ public class GatewayHook extends AbstractGatewayModuleHook {
         log.info(String.valueOf(getClass()));
 
         BundleUtil.get().addBundle("Performance", getClass(), "Performance");
+        log.info(AbstractScriptModule.class.getName().replace('.', '/'));
 
         //Verify tables for persistent records if necessary
         verifySchema(context);
