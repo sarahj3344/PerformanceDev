@@ -216,16 +216,28 @@ public class BabySharkCollector {
         }
     }
 
-    // starts capture
-    public void capture() throws IOException, NotOpenException, PcapNativeException {
+    public File setFilePath(String directory, String name){
         LocalDateTime currentDate = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd_HHmmss");
         String formattedDate = currentDate.format(formatter);
-//        String responseBody;
-        String filename = "pcapCapture_" + formattedDate + ".pcap";
+//        String filename = "pcapCapture_" + formattedDate + ".pcap";
+        String filename = name + formattedDate + ".pcap";
         GatewayContext context = GatewayHook.context;
-        File directory = context.getSystemManager().getLogsDir();
-        File file = new File(directory, filename);
+//        File directory = context.getSystemManager().getLogsDir();
+        return new File(directory, filename);
+    }
+
+    // starts capture
+    public void capture(String directory, String name) throws IOException, NotOpenException, PcapNativeException {
+//        LocalDateTime currentDate = LocalDateTime.now();
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd_HHmmss");
+//        String formattedDate = currentDate.format(formatter);
+////        String responseBody;
+//        String filename = "pcapCapture_" + formattedDate + ".pcap";
+//        GatewayContext context = GatewayHook.context;
+//        File directory = context.getSystemManager().getLogsDir();
+//        File file = new File(directory, filename);
+        File file = setFilePath(directory, name);
 
         if (!capturing.get()) {
             capturing.set(true);
@@ -320,7 +332,7 @@ public class BabySharkCollector {
 //            return null;
 //        });
 
-        if(!subsystem.isEmpty()){
+        if(subsystem != null && !subsystem.isEmpty()){
             SubsystemBase handler = SubsystemHandlerFactory.getHandler(subsystem);
             handler.clearLogging(connectionName);
         }

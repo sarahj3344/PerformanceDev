@@ -62,6 +62,35 @@
   cursor: pointer;
 }
 
+.file-input {
+  display: none; /* Hide the actual file input */
+}
+
+/* Style the label as a custom button */
+.file-label {
+  display: inline-block;
+  padding: 12px 20px;
+  margin-right: 5px;
+  width: 300px;
+  background-color: #429ede; /* Change to your desired background color */
+  color: white; /* Text color */
+  cursor: pointer; /* Change cursor to pointer */
+  font-size: 16px;
+  transition: background-color 0.3s ease; /* Smooth transition */
+}
+
+/* Add a hover effect */
+.file-label:hover {
+  background-color: #0056b3; /* Darker shade on hover */
+}
+
+/* Style for the file name display */
+.file-name {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #333; /* Color of the file name text */
+}
+
 .input-group {
   position: relative;
   display: flex; /* Ensures child elements are aligned in a row */

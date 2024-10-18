@@ -73,7 +73,7 @@ public class FlightRecordingRoutes {
         JSONObject body = new JSONObject(req);
         log.trace(body.toString());
         Apollo.setProperties(body);
-        Apollo.startRecording();
+        Apollo.startRecording(context.getSystemManager().getLogsDir().toString(),"FlightRecording_");
         return 0;
 }
 

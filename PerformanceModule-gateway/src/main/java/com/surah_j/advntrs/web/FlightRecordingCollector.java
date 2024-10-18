@@ -161,10 +161,19 @@ public class FlightRecordingCollector {
         }
     }
 
+    public File setFilePath(String directory, String name){
+        LocalDateTime currentDate = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd_HHmmss");
+        String formattedDate = currentDate.format(formatter);
+        String filename = name + formattedDate + ".jfr";
+        return new File(directory, filename);
+    }
+
     // **** Starts Recording *****
-    public void startRecording() throws IOException {
+    public void startRecording(String directory, String name) throws IOException {
         GatewayContext context = GatewayHook.context;
-        File file = dumpFile(context);
+//        File file = dumpFile(context);
+        File file = setFilePath(directory, name);
         this.file = file;
         log.info(String.valueOf(Path.of(file.getPath())));
         Configuration config = setConfiguration(configuration);
@@ -214,7 +223,6 @@ public class FlightRecordingCollector {
                     log.info("JFR recording stopped. File saved to: " + file.getPath());
                     // performs clean up on filesystem
                     cleanup(context);
-//                diagnosticFiles(reqContext);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 } finally {

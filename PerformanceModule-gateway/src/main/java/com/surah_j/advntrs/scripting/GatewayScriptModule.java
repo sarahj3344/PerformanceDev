@@ -3,18 +3,20 @@ import com.inductiveautomation.ignition.common.logging.Level;
 import com.surah_j.advntrs.GatewayHook;
 import com.surah_j.advntrs.web.BabySharkCollector;
 import com.surah_j.advntrs.web.FlightRecordingCollector;
+import com.surah_j.advntrs.scripting.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.pcap4j.core.*;
 import com.inductiveautomation.ignition.common.util.LogUtil;
 import com.inductiveautomation.ignition.common.util.LoggerEx;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
 public class GatewayScriptModule extends AbstractScriptModule {
 
-    private final LoggerEx log = LogUtil.getLogger(getClass().getSimpleName());
+//    private final LoggerEx log = LogUtil.getLogger(getClass().getSimpleName());
     BabySharkCollector Nemo = new BabySharkCollector();
     FlightRecordingCollector Apollo = new FlightRecordingCollector();
 
@@ -23,13 +25,13 @@ public class GatewayScriptModule extends AbstractScriptModule {
 //    }
 
     @Override
-    protected void startPacketCaptureImpl(String ip, String filter, String path) throws PcapNativeException, IOException, NotOpenException, JSONException {
+    protected void startPacketCaptureImpl(String ip, String filter, String name, String directory) throws PcapNativeException, IOException, NotOpenException, JSONException {
         PcapNetworkInterface device = Nemo.setNifbyAddress(ip);
         Nemo.createHandle(device);
         if(!filter.isEmpty()){
             Nemo.setFilter();
         }
-        Nemo.capture();
+        Nemo.capture(directory, name);
     }
 
     @Override
@@ -38,10 +40,10 @@ public class GatewayScriptModule extends AbstractScriptModule {
     }
 
     @Override
-    public void startFlightRecordingImpl(String path, String configuration, long age, long duration, long size, boolean dumpOnExit) throws IOException{
+    public void startFlightRecordingImpl(String name, String directory, String configuration, long age, long duration, long size, boolean dumpOnExit) throws IOException{
         Apollo.setRecordsMap();
         Apollo.setConfiguration(configuration);
-        Apollo.startRecording();
+        Apollo.startRecording(directory, name);
     }
 
     @Override

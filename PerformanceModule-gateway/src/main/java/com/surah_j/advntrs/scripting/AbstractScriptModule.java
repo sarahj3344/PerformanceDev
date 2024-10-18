@@ -10,6 +10,7 @@ import org.json.JSONException;
 import org.pcap4j.core.NotOpenException;
 import org.pcap4j.core.PcapNativeException;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import com.inductiveautomation.ignition.common.logging.Level;
@@ -36,11 +37,11 @@ public abstract class AbstractScriptModule implements Performance {
 
     @Override
     @ScriptFunction(docBundlePrefix = "AbstractScriptModule")
-    public void startPacketCapture(@ScriptArg("ip") String ip, @ScriptArg("filter") String filter, @ScriptArg("path") String path) throws PcapNativeException, IOException, NotOpenException, JSONException {
-        startPacketCaptureImpl(ip, filter, path);
+    public void startPacketCapture(@ScriptArg("ip") String ip, @ScriptArg("filter") String filter, @ScriptArg("name") String name, @ScriptArg("directory") String directory) throws PcapNativeException, IOException, NotOpenException, JSONException {
+        startPacketCaptureImpl(ip, filter, name, directory);
     }
 
-    protected abstract void startPacketCaptureImpl(String ip, String filter, String path) throws PcapNativeException, IOException, NotOpenException, JSONException;
+    protected abstract void startPacketCaptureImpl(String ip, String filter, String name, String directory) throws PcapNativeException, IOException, NotOpenException, JSONException;
 
     @Override
     @ScriptFunction(docBundlePrefix = "AbstractScriptModule")
@@ -52,11 +53,11 @@ public abstract class AbstractScriptModule implements Performance {
 
     @Override
     @ScriptFunction(docBundlePrefix = "AbstractScriptModule")
-    public void startFlightRecording(@ScriptArg("path") String path, @ScriptArg("configuration") String configuration, @ScriptArg("age") long age, @ScriptArg("duration") long duration, @ScriptArg("size") long size, @ScriptArg("dumpOnExit") boolean dumpOnExit) throws IOException {
-        startFlightRecordingImpl(path, configuration, age, duration, size, dumpOnExit);
+    public void startFlightRecording(@ScriptArg("name") String name, @ScriptArg("directory") String directory, @ScriptArg("configuration") String configuration, @ScriptArg("age") long age, @ScriptArg("duration") long duration, @ScriptArg("size") long size, @ScriptArg("dumpOnExit") boolean dumpOnExit) throws IOException {
+        startFlightRecordingImpl(name, directory, configuration, age, duration, size, dumpOnExit);
     }
 
-    protected abstract void startFlightRecordingImpl(String path, String configuration, long age, long duration, long size, boolean dumpOnExit) throws IOException;
+    protected abstract void startFlightRecordingImpl(String name, String directory, String configuration, long age, long duration, long size, boolean dumpOnExit) throws IOException;
 
     @Override
     @ScriptFunction(docBundlePrefix = "AbstractScriptModule")

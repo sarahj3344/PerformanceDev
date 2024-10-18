@@ -112,7 +112,7 @@ public class BabySharkRoutes {
                 log.trace("Handle created");
                 Nemo.setFilter();
                 log.trace("Filter set");
-                Nemo.capture();
+                Nemo.capture(context.getSystemManager().getLogsDir().toString(), "pcapCapture_");
             }
         } catch (Exception e) {
             String failure = "Capture failed.";

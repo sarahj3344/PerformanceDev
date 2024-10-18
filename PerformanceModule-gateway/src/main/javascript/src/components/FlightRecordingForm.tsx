@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 
 function FlightRecordingForm() {
   const [configuration, setConfiguration] = useState<string>("");
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [maxAge, setMaxAge] = useState<string>("");
   const [time, setTime] = useState<string>("");
   const [time2, setTime2] = useState<string>("");
@@ -91,6 +92,16 @@ function FlightRecordingForm() {
     setConfiguration(event.target.value);
   };
 
+  const handleFileUploadChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      setUploadFile(files[0]); // Use the first file from the FileList
+    } else {
+      setUploadFile(null); // Set to null if no file is selected
+    }
+  };
   const handleMaxAgeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setMaxAge(event.target.value);
   };
@@ -142,6 +153,25 @@ function FlightRecordingForm() {
                 </option>
               ))}
             </select>
+          </div>
+          <div className="input-group mb-3">
+            {/* <span className="input-group-text" id="basic-addon1">
+              Custom Configuration
+            </span> */}
+            <input
+              type="file"
+              className="file-input"
+              id="file-upload"
+              aria-label="File Upload"
+              aria-describedby="basic-addon1"
+              onChange={handleFileUploadChange}
+            />
+            <label htmlFor="file-upload" className="file-label">
+              Upload Custom Configuration
+            </label>
+            <span className="file-name" id="file-name">
+              No file chosen
+            </span>
           </div>
           <InputDropdown
             placeholder="Max Age"
