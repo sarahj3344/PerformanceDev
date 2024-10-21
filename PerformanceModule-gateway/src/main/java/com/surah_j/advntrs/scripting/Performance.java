@@ -16,8 +16,8 @@ public interface Performance {
 //    public JSONArray getNIFs() throws IOException, JSONException, PcapNativeException;
     public void startPacketCapture(String ip, String filter, String name, String directory) throws PcapNativeException, IOException, NotOpenException, JSONException;
     public void stopPacketCapture() throws NotOpenException, IOException;
-    public void startFlightRecording(String name, String directory, String configuration, long age, long duration, long size, boolean dumpOnExit) throws IOException;
+    public void startFlightRecording(String name, String directory, String configuration, long age, String ageType, long duration, String durationType, long size, String sizeType, boolean dumpOnExit) throws IOException;
     public void stopFlightRecording() throws IOException;
     public void setLogging(List<String> loggerNames, int level);
-    public void clearLogging();
+//    public void clearLogging();
 }

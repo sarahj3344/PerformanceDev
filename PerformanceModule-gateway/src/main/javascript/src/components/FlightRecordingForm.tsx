@@ -7,9 +7,9 @@ function FlightRecordingForm() {
   const [configuration, setConfiguration] = useState<string>("");
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [maxAge, setMaxAge] = useState<string>("");
-  const [time, setTime] = useState<string>("");
-  const [time2, setTime2] = useState<string>("");
-  const [size, setSize] = useState<string>("");
+  const [time, setTime] = useState<string>("m");
+  const [time2, setTime2] = useState<string>("m");
+  const [size, setSize] = useState<string>("m");
   const [maxDuration, setMaxDuration] = useState<string>("");
   const [maxSize, setMaxSize] = useState<string>("");
   const [running, setRunning] = useState(false);

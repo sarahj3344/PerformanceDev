@@ -37,9 +37,6 @@ const InputDropdown = ({
         onChange={onChange2}
         required
       >
-        {/* <option value="" disabled>
-          {placeholder}
-        </option> */}
         {rowData.map((config, index) => (
           <option key={index} value={config.value}>
             {config.label}

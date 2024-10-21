@@ -53,11 +53,11 @@ public abstract class AbstractScriptModule implements Performance {
 
     @Override
     @ScriptFunction(docBundlePrefix = "AbstractScriptModule")
-    public void startFlightRecording(@ScriptArg("name") String name, @ScriptArg("directory") String directory, @ScriptArg("configuration") String configuration, @ScriptArg("age") long age, @ScriptArg("duration") long duration, @ScriptArg("size") long size, @ScriptArg("dumpOnExit") boolean dumpOnExit) throws IOException {
-        startFlightRecordingImpl(name, directory, configuration, age, duration, size, dumpOnExit);
+    public void startFlightRecording(@ScriptArg("name") String name, @ScriptArg("directory") String directory, @ScriptArg("configuration") String configuration, @ScriptArg("age") long age, @ScriptArg("ageType") String ageType, @ScriptArg("duration") long duration, @ScriptArg("durtionType") String durationType, @ScriptArg("size") long size, @ScriptArg("sizeType") String sizeType, @ScriptArg("dumpOnExit") boolean dumpOnExit) throws IOException {
+        startFlightRecordingImpl(name, directory, configuration, age, ageType, duration, durationType, size, sizeType, dumpOnExit);
     }
 
-    protected abstract void startFlightRecordingImpl(String name, String directory, String configuration, long age, long duration, long size, boolean dumpOnExit) throws IOException;
+    protected abstract void startFlightRecordingImpl(String name, String directory, String configuration, long age, String ageType, long duration, String durationType, long size, String sizeType, boolean dumpOnExit) throws IOException;
 
     @Override
     @ScriptFunction(docBundlePrefix = "AbstractScriptModule")
@@ -75,11 +75,11 @@ public abstract class AbstractScriptModule implements Performance {
 
     protected abstract void setLoggingImpl(List<String> LoggerNames, int level);
 
-    @Override
-    @ScriptFunction(docBundlePrefix = "AbstractScriptModule")
-    public void clearLogging() {
-        clearLoggingImpl();
-    }
-
-    protected abstract void clearLoggingImpl();
+//    @Override
+//    @ScriptFunction(docBundlePrefix = "AbstractScriptModule")
+//    public void clearLogging() {
+//        clearLoggingImpl();
+//    }
+//
+//    protected abstract void clearLoggingImpl();
 }

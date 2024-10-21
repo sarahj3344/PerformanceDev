@@ -16,7 +16,7 @@ import java.util.List;
 
 public class GatewayScriptModule extends AbstractScriptModule {
 
-//    private final LoggerEx log = LogUtil.getLogger(getClass().getSimpleName());
+    private final LoggerEx log = LogUtil.getLogger(getClass().getSimpleName());
     BabySharkCollector Nemo = new BabySharkCollector();
     FlightRecordingCollector Apollo = new FlightRecordingCollector();
 
@@ -40,10 +40,10 @@ public class GatewayScriptModule extends AbstractScriptModule {
     }
 
     @Override
-    public void startFlightRecordingImpl(String name, String directory, String configuration, long age, long duration, long size, boolean dumpOnExit) throws IOException{
+    public void startFlightRecordingImpl(String name, String directory, String configuration, long age, String ageType, long duration, String durationType, long size, String sizeType, boolean dumpOnExit) throws IOException{
         Apollo.setRecordsMap();
         Apollo.setConfiguration(configuration);
-        Apollo.startRecording(directory, name);
+        Apollo.startRecording(directory, name, configuration, age, ageType, duration, durationType, size, sizeType, dumpOnExit);
     }
 
     @Override
@@ -58,8 +58,8 @@ public class GatewayScriptModule extends AbstractScriptModule {
         }
     }
 
-    @Override
-    protected void clearLoggingImpl() {
-        GatewayHook.context.getLoggingManager().clearPropertyLevels();
-    }
+//    @Override
+//    protected void clearLoggingImpl() {
+//        GatewayHook.context.getLoggingManager().clearPropertyLevels();
+//    }
 }

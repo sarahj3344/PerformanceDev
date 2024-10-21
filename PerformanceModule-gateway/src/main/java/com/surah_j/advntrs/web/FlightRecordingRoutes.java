@@ -72,8 +72,10 @@ public class FlightRecordingRoutes {
         GatewayContext context = request.getGatewayContext();
         JSONObject body = new JSONObject(req);
         log.trace(body.toString());
-        Apollo.setProperties(body);
-        Apollo.startRecording(context.getSystemManager().getLogsDir().toString(),"FlightRecording_");
+        JSONObject properties = Apollo.setProperties(body);
+        log.info(properties.getLong("age") + " " + properties.getString("ageType"));
+        Apollo.startRecording(context.getSystemManager().getLogsDir().toString(),"FlightRecording_", properties.getString("configuration"),
+                properties.getLong("age"), properties.getString("ageType"), properties.getLong("duration"), properties.getString("durationType"), properties.getLong("size"), properties.getString("sizeType"), properties.getBoolean("dumpOnExit"));
         return 0;
 }
 

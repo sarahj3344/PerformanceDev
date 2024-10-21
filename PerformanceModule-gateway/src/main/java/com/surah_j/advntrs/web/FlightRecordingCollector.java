@@ -38,10 +38,6 @@ public class FlightRecordingCollector {
     private Boolean exit = false;
     private File file;
 
-    private long age = 0;
-    private long maxSize = 0;
-    private long duration = 0;
-
     private String ageType = "m";
     private String sizeType = "m";
     private String durationType = "m";
@@ -49,10 +45,14 @@ public class FlightRecordingCollector {
     GatewayContext context;
 
     // takes the body of the response in start capture route and sets variables
-    public void setProperties(JSONObject body) throws JSONException {
+    public JSONObject setProperties(JSONObject body) throws JSONException {
+        JSONObject properties = new JSONObject();
+
+        log.info(body.toString());
         configuration = body.getString("configuration");
         ageType = body.getString("ageTime");
         sizeType = body.getString("sizeMetric");
+        durationType = body.getString("durationTime");
         exit = body.getBoolean("exit");
         String durationStr = body.getString("duration");
         String maxSizeStr = body.getString("size");
@@ -61,7 +61,8 @@ public class FlightRecordingCollector {
         // Check if strings are not empty before parsing
         if (ageStr != null && !ageStr.isEmpty()) {
             try {
-                age = Long.parseLong(ageStr);
+                properties.put("age", Long.parseLong(ageStr));
+                properties.put("ageType", ageType);
             } catch (NumberFormatException e) {
                 e.printStackTrace();
             }
@@ -69,7 +70,8 @@ public class FlightRecordingCollector {
 
         if (durationStr != null && !durationStr.isEmpty()) {
             try {
-                duration = Long.parseLong(durationStr);
+                properties.put("duration", Long.parseLong(durationStr));
+                properties.put("durationType", durationType);
             } catch (NumberFormatException e) {
                 e.printStackTrace();
             }
@@ -77,13 +79,18 @@ public class FlightRecordingCollector {
 
         if (maxSizeStr != null && !maxSizeStr.isEmpty()) {
             try {
-                maxSize = Long.parseLong(maxSizeStr);
+                properties.put("size", Long.parseLong(maxSizeStr));
+                properties.put("sizeType", sizeType);
             } catch (NumberFormatException e) {
                 e.printStackTrace();
             }
         }
 
         exit = body.getBoolean("exit");
+        properties.put("configuration", body.getString("configuration"));
+        properties.put("dumpOnExit", body.getBoolean("exit"));
+
+        return properties;
     }
 
     // maps to jfr configuration files
@@ -111,7 +118,7 @@ public class FlightRecordingCollector {
     }
 
     // sets the maxiumum age of data to disk for recording.
-    public void setMaxAge(long maxAge) {
+    public void setMaxAge(long maxAge, String ageType) {
         if (recording != null) {
             switch (ageType) {
                 case "d":
@@ -128,7 +135,7 @@ public class FlightRecordingCollector {
     }
 
     // sets the maximum duration for the recording
-    public void setMaxDuration(long duration) {
+    public void setMaxDuration(long duration, String durationType) {
         if (recording != null) {
             switch (durationType) {
                 case "d":
@@ -145,7 +152,7 @@ public class FlightRecordingCollector {
     }
 
     // Maximum size for the recording in bytes.
-    public void setMaxSize(long maxSize) {
+    public void setMaxSize(long maxSize, String sizeType) {
         if (recording != null) {
             long length;
             switch (sizeType) {
@@ -170,23 +177,23 @@ public class FlightRecordingCollector {
     }
 
     // **** Starts Recording *****
-    public void startRecording(String directory, String name) throws IOException {
+    public void startRecording(String directory, String name, String configuration, long age, String ageType, long duration, String durationType, long size, String sizeType, boolean dumpOnExit) throws IOException {
         GatewayContext context = GatewayHook.context;
-//        File file = dumpFile(context);
         File file = setFilePath(directory, name);
         this.file = file;
         log.info(String.valueOf(Path.of(file.getPath())));
         Configuration config = setConfiguration(configuration);
         recording = new Recording(config);
-        if(age != 0){setMaxAge(age);}
-        if(duration != 0){setMaxDuration(duration);}
-        if(maxSize != 0){setMaxSize(maxSize);}
-        if(exit){
-            recording.setDumpOnExit(exit);
+        if(age != 0){setMaxAge(age, ageType);}
+        if(duration != 0){setMaxDuration(duration, durationType);}
+        if(size != 0){setMaxSize(size, sizeType);}
+        if(dumpOnExit){
+            recording.setDumpOnExit(true);
         }
         recording.setToDisk(true);
         recording.setDestination(Path.of(file.getPath()));
         recording.setName("FlightRecording");
+        log.trace("SETTINGS: " + recording.getMaxAge() + " " + recording.getMaxSize() + " " + recording.getDumpOnExit());
         recording.start();
 
         jfrCapturing.set(true);
@@ -206,7 +213,7 @@ public class FlightRecordingCollector {
         try {
             // Checks state of recording
             while (recording.getState().equals(RUNNING)) {
-                Thread.sleep(1000);
+                Thread.sleep(3000);
             }
             log.info("Recording has stopped");
             cleanup(context);
@@ -270,9 +277,9 @@ public class FlightRecordingCollector {
         // resets variables for next recording
         configuration = null;
         file = null;
-        maxSize = 0;
-        age = 0;
-        duration = 0;
+        long maxSize = 0;
+        long age = 0;
+        long duration = 0;
         ageType = "m";
         sizeType = "m";
         durationType = "m";
